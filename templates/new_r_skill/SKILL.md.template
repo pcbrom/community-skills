@@ -1,0 +1,68 @@
+---
+name: <your-skill-name>
+runtime: r
+package: <upstream-r-package-name>
+package_source: CRAN
+package_url: https://github.com/<owner>/<repo>
+package_version_pinned: ">=X.Y.Z"
+license: <MIT|GPL-2|GPL-3|BSD|Apache-2.0>
+maintainer: "<Your Name> <you@example.com>"
+---
+
+# Skill: <your-skill-name>
+
+One paragraph describing what the wrapped package does and why an LLM agent
+might want to call it. State explicitly what kind of data, problem, or
+decision triggers the use of this skill.
+
+If the package has a canonical paper, cite it here in ABNT or the venue's
+style. Include a DOI link.
+
+## Prerequisites
+
+- R available on `PATH`.
+- The package installed: `install.packages("<upstream-r-package-name>")`.
+
+## Functions exposed
+
+For each function the agent may call, document a separate sub-section with:
+input schema, output schema, a worked example.
+
+### `<function_name_1>` — one-line summary
+
+**Input**
+
+```json
+{
+  "fn": "<function_name_1>",
+  "<arg1>": <schema>,
+  "<arg2>": <schema>
+}
+```
+
+**Output**
+
+```json
+{ "ok": true, "fn": "<function_name_1>", "result": <schema> }
+```
+
+(repeat per exposed function)
+
+## When to invoke
+
+Bullet list of situations where the agent should reach for this skill. Be
+concrete. Avoid generic phrasing.
+
+## Error contract
+
+Any failure inside R returns:
+
+```json
+{ "ok": false, "fn": "<requested>", "error": "<human-readable message>" }
+```
+
+## Worked example
+
+```bash
+echo '<your minimal JSON payload>' | Rscript --vanilla skills/<your-skill-name>/invoke.R
+```

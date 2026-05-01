@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "community-skills"
+version = "0.1.0"
+description = "A community hub for wrapping packages as agent-callable skills (R, Python, Julia, ...)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Pedro Carvalho Brom", email = "pcbrom@gmail.com" }]
+keywords = [
+    "agentic-coding",
+    "llm-skills",
+    "package-wrapping",
+    "subprocess-bridge",
+    "json-schema",
+    "claude-code",
+    "codex",
+    "opencode",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/pcbrom/community-skills"
+Repository = "https://github.com/pcbrom/community-skills"
+Issues = "https://github.com/pcbrom/community-skills/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bridges*"]
+exclude = ["tests*", "docs*", "skills*", "templates*"]

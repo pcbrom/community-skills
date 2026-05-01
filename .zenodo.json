@@ -1,0 +1,47 @@
+{
+    "title": "community-skills: A community hub for wrapping packages as agent-callable skills (v0.1.0)",
+    "description": "community-skills is a public hub for exposing packages from any language ecosystem (R, Python, Julia, Stata, ...) as machine-readable skills that LLM agents (Claude Code, Codex, OpenCode, third-party tools) can invoke autonomously. Each skill ships a SKILL.md contract (function-level schemas), an invoke script in the package's native language, and a thin per-runtime bridge (subprocess + JSON) that any agent harness can drive. v0.1.0 implements the R bridge and ships bgumbel (Otiniano, Gabriel, Brom, Pereira 2023; ~48,000 CRAN downloads; 10 citing papers) as the canonical first skill, with placeholders for Python and Julia bridges to be contributed by the community. The repo is independent of any particular agent runtime: it requires only that the calling environment can spawn a subprocess and exchange JSON.",
+    "upload_type": "software",
+    "creators": [
+        {
+            "name": "Brom, Pedro Carvalho",
+            "affiliation": "Department of Mathematics, Federal Institute of Brasilia",
+            "orcid": "0000-0002-1288-7695"
+        }
+    ],
+    "keywords": [
+        "agentic coding",
+        "LLM skills",
+        "package wrapping",
+        "R",
+        "CRAN",
+        "Python",
+        "Julia",
+        "subprocess bridge",
+        "JSON schema",
+        "machine-readable contract",
+        "Claude Code",
+        "Codex",
+        "OpenCode",
+        "bgumbel",
+        "bimodal Gumbel"
+    ],
+    "license": "MIT",
+    "related_identifiers": [
+        {
+            "identifier": "https://github.com/pcbrom/bgumbel",
+            "relation": "documents",
+            "resource_type": "software",
+            "scheme": "url"
+        },
+        {
+            "identifier": "10.5281/zenodo.19772195",
+            "relation": "isPartOf",
+            "resource_type": "software",
+            "scheme": "doi"
+        }
+    ],
+    "references": [
+        "Otiniano, C. E. G.; Gabriel, R. V.; Brom, P. C.; Pereira, M. B. (2023). On the Bimodal Gumbel Model with Application to Environmental Data. Austrian Journal of Statistics, 52, 45-65."
+    ]
+}

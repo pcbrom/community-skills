@@ -1,0 +1,59 @@
+name: Bug report
+description: Something is wrong with a bridge, a skill, or the build.
+title: "[bug] <short summary>"
+labels: ["bug", "triage"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - bridges/r.py
+        - bridges/python.py (placeholder)
+        - bridges/julia.py (placeholder)
+        - skills/bgumbel
+        - other skill (specify in description)
+        - CI / workflows
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: payload
+    attributes:
+      label: JSON payload
+      description: The exact JSON you sent (redact secrets).
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: result
+    attributes:
+      label: Observed result
+      description: The full JSON response or error message.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "OS, Python version, R version (Rscript --version), upstream package version"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproducer
+      description: Minimal script or commands that reproduce the issue.
+      render: bash

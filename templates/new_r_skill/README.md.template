@@ -1,0 +1,30 @@
+# <your-skill-name> skill
+
+Wraps the [<upstream-r-package-name>](https://github.com/<owner>/<repo>) R package.
+
+## Prerequisites
+
+- R available on `PATH`.
+- `install.packages("<upstream-r-package-name>")`.
+
+## Usage from a shell
+
+```bash
+echo '<your minimal JSON payload>' | Rscript --vanilla skills/<your-skill-name>/invoke.R
+```
+
+## Usage from Python
+
+```python
+from bridges import invoke
+result = invoke("<your-skill-name>", {"fn": "<function_name_1>", ...})
+```
+
+## Functions
+
+See [SKILL.md](SKILL.md) for the full machine-readable contract.
+
+## Citation
+
+See [CITATION.md](CITATION.md). Cite both the upstream package and the
+community-skills release you used.

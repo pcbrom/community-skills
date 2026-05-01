@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use community-skills in your work, please cite as below."
+title: "community-skills: A community hub for wrapping packages as agent-callable skills"
+version: 0.1.0
+date-released: "2026-05-13"
+authors:
+  - family-names: "Brom"
+    given-names: "Pedro Carvalho"
+    orcid: "https://orcid.org/0000-0002-1288-7695"
+    affiliation: "Federal Institute of Brasilia, Department of Mathematics"
+license: MIT
+repository-code: "https://github.com/pcbrom/community-skills"
+type: software
+keywords:
+  - "agentic coding"
+  - "LLM skills"
+  - "package wrapping"
+  - "R"
+  - "CRAN"
+  - "subprocess bridge"
+  - "JSON schema"
+  - "machine-readable contract"
+references:
+  - type: article
+    authors:
+      - family-names: "Otiniano"
+        given-names: "Cira E. G."
+      - family-names: "Vila"
+        given-names: "Roberto"
+      - family-names: "Brom"
+        given-names: "Pedro Carvalho"
+      - family-names: "Pereira"
+        given-names: "Marcelo B."
+    title: "On the Bimodal Gumbel Model with Application to Environmental Data"
+    journal: "Austrian Journal of Statistics"
+    year: 2023
+    volume: 52
+    start: 45
+    end: 65
+    doi: "10.17713/ajs.v52i2.1392"
