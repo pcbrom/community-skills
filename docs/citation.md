@@ -15,7 +15,7 @@ GitHub renders it under "Cite this repository" on the project page.
   author       = {Brom, Pedro Carvalho and contributors},
   title        = {community-skills: A community hub for wrapping packages as agent-callable skills},
   version      = {0.1.0},
-  date         = {2026-05-13},
+  date         = {2026-05-06},
   publisher    = {Zenodo},
   doi          = {<DOI assigned at first release>},
   url          = {https://github.com/pcbrom/community-skills}
@@ -34,7 +34,7 @@ community-skills release you used. Example for bgumbel:
 
 ```bibtex
 @article{otiniano2023bgumbel,
-  author  = {Otiniano, Cira E. G. and Vila, Roberto and Brom, Pedro Carvalho and Pereira, Marcelo B.},
+  author  = {Otiniano, Cira E. G. and Vila, Roberto and Brom, Pedro Carvalho and Bourguignon, Marcelo},
   title   = {On the Bimodal Gumbel Model with Application to Environmental Data},
   journal = {Austrian Journal of Statistics},
   year    = {2023},

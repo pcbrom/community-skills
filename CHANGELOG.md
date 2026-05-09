@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file. This project ad
 
 Each release receives a Zenodo DOI. The DOI is added to the entry below once the deposit completes.
 
-## [0.1.0] - 2026-05-13
+## [0.1.0] - 2026-05-06
 
 Initial public release.
 
@@ -23,4 +23,4 @@ Initial public release.
 - TBD (added after first release deposit).
 
 ### References
-- Otiniano, C. E. G.; Gabriel, R. V.; Brom, P. C.; Pereira, M. B. (2023). *On the Bimodal Gumbel Model with Application to Environmental Data*. Austrian Journal of Statistics, **52**, 45-65. [DOI 10.17713/ajs.v52i2.1392](https://doi.org/10.17713/ajs.v52i2.1392).
+- Otiniano, C. E. G.; Vila, R.; Brom, P. C.; Bourguignon, M. (2023). *On the Bimodal Gumbel Model with Application to Environmental Data*. Austrian Journal of Statistics, **52**, 45-65. [DOI 10.17713/ajs.v52i2.1392](https://doi.org/10.17713/ajs.v52i2.1392).

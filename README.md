@@ -1,9 +1,9 @@
 # community-skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml)
+[![tests](https://img.shields.io/badge/tests-pending-lightgrey.svg)](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml)
 [![Skills: 1](https://img.shields.io/badge/skills-1-blue.svg)](skills/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.0000000.svg)](https://doi.org/10.5281/zenodo.0000000)
+[![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](https://zenodo.org/)
 
 A community hub that exposes packages from any language ecosystem (R, Python, Julia, Stata, ...) as machine-readable skills that LLM agents can invoke autonomously.
 
@@ -17,9 +17,9 @@ community-skills documents a single pattern that turns any package into an agent
 
 Each `skills/<name>/` directory ships:
 
-- `SKILL.md` — a machine-readable contract that declares the skill's runtime (`r`, `python`, `julia`, ...) and lists each exposed function with input and output JSON schemas.
-- `invoke.<ext>` — the dispatcher in the package's native language. It reads a JSON object from stdin, routes on the `fn` field, calls the wrapped function, writes a JSON object to stdout.
-- `invoke.py` — an optional Python wrapper that re-exports the skill via the appropriate bridge.
+- `SKILL.md`: a machine-readable contract that declares the skill's runtime (`r`, `python`, `julia`, ...) and lists each exposed function with input and output JSON schemas.
+- `invoke.<ext>`: the dispatcher in the package's native language. It reads a JSON object from stdin, routes on the `fn` field, calls the wrapped function, writes a JSON object to stdout.
+- `invoke.py`: an optional Python wrapper that re-exports the skill via the appropriate bridge.
 
 Each `bridges/<runtime>.py` is a thin Python adapter that spawns the runtime, sends the JSON payload, and parses the response. Today, `bridges/r.py` is implemented; `bridges/python.py` and `bridges/julia.py` are placeholders that raise `NotImplementedError` and link to the issue tracker for community contribution.
 
@@ -121,7 +121,7 @@ From inside an agent session, the same call is a single tool invocation. See [`d
 
 | Version | Planned content |
 |---|---|
-| v0.1.0 (2026-05-13) | Pattern + R bridge + bgumbel skill. |
+| v0.1.0 (2026-05-06) | Pattern + R bridge + bgumbel skill. |
 | v0.2.0+ | Second skill chosen by community demand (likely Python via subprocess + venv, or Julia). |
 | ongoing | Each merged PR that adds a skill or bridge ships in a minor release with its own Zenodo DOI. |
 

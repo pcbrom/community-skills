@@ -4,7 +4,7 @@ When citing the bgumbel skill, please credit both the underlying R package and t
 
 ## R package and canonical paper
 
-> Otiniano, C. E. G.; Gabriel, R. V.; Brom, P. C.; Pereira, M. B. (2023).
+> Otiniano, C. E. G.; Vila, R.; Brom, P. C.; Bourguignon, M. (2023).
 > *On the Bimodal Gumbel Model with Application to Environmental Data*.
 > Austrian Journal of Statistics, **52**, 45-65.
 > DOI [10.17713/ajs.v52i2.1392](https://doi.org/10.17713/ajs.v52i2.1392).
@@ -15,7 +15,7 @@ BibTeX:
 
 ```bibtex
 @article{otiniano2023bgumbel,
-  author  = {Otiniano, Cira E. G. and Vila, Roberto and Brom, Pedro Carvalho and Pereira, Marcelo B.},
+  author  = {Otiniano, Cira E. G. and Vila, Roberto and Brom, Pedro Carvalho and Bourguignon, Marcelo},
   title   = {On the Bimodal Gumbel Model with Application to Environmental Data},
   journal = {Austrian Journal of Statistics},
   year    = {2023},

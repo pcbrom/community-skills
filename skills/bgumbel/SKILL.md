@@ -18,7 +18,7 @@ two-failure-mode reliability, bull/bear financial returns).
 
 The wrapped package is documented in:
 
-> Otiniano, C. E. G.; Gabriel, R. V.; Brom, P. C.; Pereira, M. B. (2023).
+> Otiniano, C. E. G.; Vila, R.; Brom, P. C.; Bourguignon, M. (2023).
 > *On the Bimodal Gumbel Model with Application to Environmental Data*.
 > Austrian Journal of Statistics, **52**, 45-65.
 > DOI [10.17713/ajs.v52i2.1392](https://doi.org/10.17713/ajs.v52i2.1392).
@@ -38,7 +38,7 @@ two-component Gumbel mixture, while remaining identifiable).
 
 The dispatcher selects on the `fn` field of the JSON payload.
 
-### `dbgumbel` — density
+### `dbgumbel`: density
 
 Evaluate the bimodal Gumbel probability density at one or more points.
 
@@ -61,7 +61,7 @@ Evaluate the bimodal Gumbel probability density at one or more points.
 { "ok": true, "fn": "dbgumbel", "result": [number, ...] }
 ```
 
-### `pbgumbel` — cumulative distribution
+### `pbgumbel`: cumulative distribution
 
 **Input**
 
@@ -82,7 +82,7 @@ Evaluate the bimodal Gumbel probability density at one or more points.
 { "ok": true, "fn": "pbgumbel", "result": [number, ...] }
 ```
 
-### `qbgumbel` — quantile function
+### `qbgumbel`: quantile function
 
 Invert the CDF using a numerical search bracketed by `[initial, final]`.
 
@@ -106,7 +106,7 @@ Invert the CDF using a numerical search bracketed by `[initial, final]`.
 { "ok": true, "fn": "qbgumbel", "result": [number, ...] }
 ```
 
-### `rbgumbel` — random variates
+### `rbgumbel`: random variates
 
 **Input**
 
@@ -127,7 +127,7 @@ Invert the CDF using a numerical search bracketed by `[initial, final]`.
 { "ok": true, "fn": "rbgumbel", "result": [number, ...] }
 ```
 
-### `m1bgumbel` — first moment
+### `m1bgumbel`: first moment
 
 Closed-form $E[X]$ of the bimodal Gumbel.
 
@@ -143,7 +143,7 @@ Closed-form $E[X]$ of the bimodal Gumbel.
 { "ok": true, "fn": "m1bgumbel", "result": number }
 ```
 
-### `m2bgumbel` — second moment
+### `m2bgumbel`: second moment
 
 Closed-form $E[X^2]$ of the bimodal Gumbel.
 
@@ -159,7 +159,7 @@ Closed-form $E[X^2]$ of the bimodal Gumbel.
 { "ok": true, "fn": "m2bgumbel", "result": number }
 ```
 
-### `init_theta` — robust starting values for MLE
+### `init_theta`: robust starting values for MLE
 
 Returns a robust starting triple `(mu, sigma, delta)` for the maximum-likelihood
 estimator. Numerical MLE for the bimodal Gumbel is sensitive to initialization;
@@ -194,7 +194,7 @@ absolute deviation rescaled to a Gumbel-equivalent scale (with a small floor
 to prevent a degenerate seed), and `delta = 0.1` provides a near-unimodal
 seed that lets the optimizer move toward the bimodal regime.
 
-### `mlebgumbel` — maximum likelihood estimation
+### `mlebgumbel`: maximum likelihood estimation
 
 Fit `mu`, `sigma`, `delta` to a sample by numerical MLE. The agent may pass
 its own `theta` triple; if absent, the dispatcher uses `init_theta`'s strategy

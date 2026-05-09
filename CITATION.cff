@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use community-skills in your work, please cite as below."
 title: "community-skills: A community hub for wrapping packages as agent-callable skills"
 version: 0.1.0
-date-released: "2026-05-13"
+date-released: "2026-05-06"
 authors:
   - family-names: "Brom"
     given-names: "Pedro Carvalho"
@@ -29,8 +29,8 @@ references:
         given-names: "Roberto"
       - family-names: "Brom"
         given-names: "Pedro Carvalho"
-      - family-names: "Pereira"
-        given-names: "Marcelo B."
+      - family-names: "Bourguignon"
+        given-names: "Marcelo"
     title: "On the Bimodal Gumbel Model with Application to Environmental Data"
     journal: "Austrian Journal of Statistics"
     year: 2023
