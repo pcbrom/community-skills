@@ -51,3 +51,23 @@ gh api repos/pcbrom/community-skills/traffic/popular/referrers
 ```
 
 Plus the LinkedIn `PostAnalytics_*.xlsx` exports at +24h / +96h / +168h.
+
+---
+
+# v0.2.0 release checklist (cran-graph + curated CRAN skills, Phase 1-3 of the sprint)
+
+This section covers only the technical release of the hub itself: tag, GitHub release, Zenodo deposit, badge updates. Post-LinkedIn artefacts and outreach scheduling do not live in this repository; those belong to the `linkedin_master` project and are coordinated from there.
+
+## Repo prep (before tag)
+
+- [ ] Promote the `## [Unreleased]` block in `CHANGELOG.md` to `## [0.2.0] - <date>` once the author approves the cut.
+- [ ] `gh repo edit` description updated to mention `cran_graph` and LLM-callable skills.
+- [ ] README and `skills/README.md` sanity check by the author (both updated in this session).
+- [ ] `cran-graph optimize` smoke run on at least three real targets in a clean environment; output captured under `data/release_smoke/v0.2.0/`.
+
+## Tag and Zenodo deposit
+
+- [ ] `git tag -a v0.2.0 -m "v0.2.0: cran_graph + curated CRAN skills (Phase 1-3 of cran-graph sprint)"`.
+- [ ] `git push origin v0.2.0`.
+- [ ] `gh release create v0.2.0 --title "v0.2.0: cran_graph + curated CRAN skills" --notes-from-tag --latest`.
+- [ ] Confirm the Zenodo webhook produced a fresh DOI; copy the DOI back into `CHANGELOG.md`, the README badge, `docs/citation.md`, and `linkedin_master/livro/REFERENCIAS.md` (the cross-reference itself lives in `linkedin_master`, but the DOI is the canonical anchor).

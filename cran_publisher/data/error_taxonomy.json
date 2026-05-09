@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "categories": [
+    {
+      "key": "missing_documentation",
+      "label": "Missing or incomplete Rd documentation",
+      "patterns": [
+        "missing documentation entries",
+        "functions? without documentation",
+        "undocumented (code|argument|data sets)",
+        "missing description",
+        "\\\\arguments missing"
+      ]
+    },
+    {
+      "key": "undefined_globals",
+      "label": "Undefined global functions or variables",
+      "patterns": [
+        "no visible (binding|global function definition)",
+        "undefined global functions or variables"
+      ]
+    },
+    {
+      "key": "namespace",
+      "label": "NAMESPACE / imports / exports issue",
+      "patterns": [
+        "object .* (is|are) not exported",
+        "in .NAMESPACE.",
+        "importFrom",
+        "undeclared imports?",
+        "exports? .+ not present",
+        "namespace dependencies not required"
+      ]
+    },
+    {
+      "key": "deprecated_api",
+      "label": "Deprecated or defunct R API usage",
+      "patterns": [
+        "is deprecated",
+        "\\.Defunct",
+        "\\.Deprecated",
+        "will be removed in a future version"
+      ]
+    },
+    {
+      "key": "rd_syntax",
+      "label": "Rd file syntax / cross-reference issue",
+      "patterns": [
+        "missing link",
+        "unknown macro",
+        "problems? with .Rd .*",
+        "unmatched .{|}",
+        "checking .Rd files"
+      ]
+    },
+    {
+      "key": "examples",
+      "label": "Examples failing or excessively slow",
+      "patterns": [
+        "examples? .* failed",
+        "examples? .* error",
+        "running examples?",
+        "checking examples? .* (WARNING|ERROR|NOTE)",
+        "\\\\dontrun .* not allowed"
+      ]
+    },
+    {
+      "key": "tests",
+      "label": "Test suite failure",
+      "patterns": [
+        "checking tests? .*",
+        "test ?that failed",
+        "running .R unit tests.",
+        "failures? in tests?"
+      ]
+    },
+    {
+      "key": "vignettes",
+      "label": "Vignette build issue",
+      "patterns": [
+        "checking (re-)?building of vignettes?",
+        "vignette .* (failed|error)"
+      ]
+    },
+    {
+      "key": "url_check",
+      "label": "Broken URL or DOI",
+      "patterns": [
+        "^URL$",
+        "\\bURLs?\\b",
+        "invalid URLs?",
+        "non-standard.*URL",
+        "moved permanently",
+        "unable to resolve host",
+        "\\bDOI[s]?\\b",
+        "\\(404\\)",
+        "\\(403\\)"
+      ]
+    },
+    {
+      "key": "license",
+      "label": "License field issue",
+      "patterns": [
+        "checking package license",
+        "license is .* unknown",
+        "file LICEN[SC]E",
+        "non-standard license specification"
+      ]
+    },
+    {
+      "key": "encoding",
+      "label": "Encoding / non-ASCII content",
+      "patterns": [
+        "non-ASCII",
+        "declared encoding",
+        "unable to translate",
+        "invalid (multi)?byte string"
+      ]
+    },
+    {
+      "key": "build_compile",
+      "label": "C / C++ / Fortran compilation issue",
+      "patterns": [
+        "checking compilation flags",
+        "package native routines",
+        "undefined reference",
+        "call to (un)?registered routines?",
+        "compilation failed"
+      ]
+    },
+    {
+      "key": "size",
+      "label": "Package or sub-directory size issue",
+      "patterns": [
+        "installed size",
+        "sub-directory .* is large",
+        "checking package size"
+      ]
+    },
+    {
+      "key": "incoming_feasibility",
+      "label": "CRAN incoming feasibility (initial submission gate)",
+      "patterns": [
+        "checking CRAN incoming feasibility",
+        "new submission",
+        "version contains.*",
+        "days/since/last/release"
+      ]
+    },
+    {
+      "key": "description_metadata",
+      "label": "DESCRIPTION metadata field issue",
+      "patterns": [
+        "for file .+DESCRIPTION",
+        "required fields? (missing|empty|absent|ausente)",
+        "campos? requeridos? ausentes",
+        "\\bAuthor\\b.*(missing|empty)",
+        "\\bMaintainer\\b.*(missing|empty)",
+        "Authors@R",
+        "malformed (Title|Description) field"
+      ]
+    }
+  ]
+}

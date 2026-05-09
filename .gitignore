@@ -35,3 +35,13 @@ Thumbs.db
 *~
 CLAUDE.md
 BRIEFING.md
+.claude/
+
+# cran_graph snapshots (large binary; share via release/Zenodo)
+/data/
+*.sqlite
+*.sqlite-journal
+
+# Skill generation staging (LLM output awaiting human review)
+/skills/_staging/
+/cran_graph_extra/
