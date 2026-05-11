@@ -7,13 +7,20 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # Opt into Node.js 24 for all JavaScript-based actions in this workflow.
+  # GitHub deprecated Node 20 on 2025-09-19 and will remove it from runners
+  # on 2026-09-16; the flag will become the default on 2026-06-02 anyway.
+  # Documentation: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -28,7 +35,7 @@ jobs:
           Rscript -e 'cat("bgumbel version:", as.character(packageVersion("bgumbel")), "\n")'
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -39,7 +46,7 @@ jobs:
 
       - name: Smoke test the R bridge directly
         run: |
-          echo '{"fn":"dbgumbel","x":[-1.0,0.0,1.0],"mu1":-1.0,"mu2":1.0,"delta":0.5}' \
+          echo '{"fn":"dbgumbel","x":[-1.0,0.0,1.0],"mu":0.0,"sigma":1.0,"delta":0.5}' \
             | Rscript --vanilla skills/bgumbel/invoke.R
 
       - name: Run pytest
