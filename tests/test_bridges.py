@@ -50,17 +50,51 @@ def test_read_runtime_raises_when_missing(tmp_path):
         _read_runtime(skill_md)
 
 
-def test_python_bridge_is_placeholder():
-    """The Python bridge raises NotImplementedError until implemented."""
+def test_python_bridge_missing_invoke_py(tmp_path):
+    """The Python bridge surfaces a structured error when the skill dir
+    has no invoke.py, mirroring the R bridge contract."""
     from bridges.python import invoke as invoke_py
-    with pytest.raises(NotImplementedError):
-        invoke_py("any/path", {"fn": "x"})
+    result = invoke_py(tmp_path, {"fn": "x"})
+    assert result["ok"] is False
+    assert "missing invoke.py" in result["error"]
 
 
-def test_julia_bridge_is_placeholder():
-    from bridges.julia import invoke as invoke_jl
-    with pytest.raises(NotImplementedError):
-        invoke_jl("any/path", {"fn": "x"})
+def test_python_bridge_payload_not_serializable(tmp_path):
+    """Sets are not JSON-serializable; the bridge catches the error
+    instead of letting the subprocess fail with a useless stderr."""
+    from bridges.python import invoke as invoke_py
+    (tmp_path / "invoke.py").write_text("import sys; sys.exit(0)\n", encoding="utf-8")
+    result = invoke_py(tmp_path, {"fn": "x", "bad": {1, 2, 3}})
+    assert result["ok"] is False
+    assert "JSON-serializable" in result["error"]
+
+
+def test_python_bridge_emits_ok_for_well_formed_skill(tmp_path):
+    """End-to-end happy path with a one-line dispatcher."""
+    from bridges.python import invoke as invoke_py
+    (tmp_path / "invoke.py").write_text(
+        "import json, sys\n"
+        "p = json.loads(sys.stdin.read())\n"
+        "print(json.dumps({'ok': True, 'fn': p['fn'], 'result': p.get('value')}))\n",
+        encoding="utf-8",
+    )
+    result = invoke_py(tmp_path, {"fn": "echo", "value": 42})
+    assert result["ok"] is True
+    assert result["fn"] == "echo"
+    assert result["result"] == 42
+
+
+def test_julia_runtime_is_reported_as_unknown(tmp_path, monkeypatch):
+    """Julia is out of scope for this project (decided 2026-05-09).
+    A SKILL.md that declares ``runtime: julia`` is reported as unknown,
+    same as ``cobol``."""
+    fake = tmp_path / "julia_skill"
+    fake.mkdir()
+    (fake / "SKILL.md").write_text("---\nruntime: julia\n---\n", encoding="utf-8")
+    monkeypatch.setattr("bridges.SKILLS_DIR", tmp_path)
+    result = invoke("julia_skill", {"fn": "x"})
+    assert result["ok"] is False
+    assert "unknown runtime" in result["error"].lower()
 
 
 def test_bridge_handles_unknown_runtime(tmp_path, monkeypatch):

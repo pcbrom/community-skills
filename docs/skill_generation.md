@@ -17,18 +17,25 @@ data/top_cran_curated.json
    |
    v
 generate_skills_via_gemma.py  --triage data/top_cran_curated.json
-   |  fetch tarball -> parse DESCRIPTION + NAMESPACE + Rd
-   |  build prompt with editorial contract pinned
-   |  call Ollama (gemma4:26b-fast, temperature 0.2)
+   |  fetch tarball -> parse DESCRIPTION + NAMESPACE + Rd (incl. \arguments{})
+   |  build prompt with editorial contract pinned + upstream signatures
+   |  call Ollama (gemma4:26b-fast, temperature 0.2, think: false)
    |  validate front matter, required sections, em-dash, forbidden terms
    v
 skills/_staging/<package>/{SKILL.md, _meta.json}
    |
    v
-[human review]
+generate_invoke_r.py  (per-package, re-fetches metadata for upstream signatures)
+   |  prompt Gemma with bgumbel/invoke.R as the few-shot anchor
+   |  validate Rscript parse + typo guards
+   v
+skills/_staging/<package>/invoke.R
    |
    v
-skills/<package>/  (promotion: copy SKILL.md, hand-write invoke.R, add tests)
+promote_all.py  (idempotent; smoke-screens each dispatcher with an unknown fn)
+   |
+   v
+skills/<package>/{SKILL.md, invoke.R} + tests/test_skills/test_<package>.py stub
 ```
 
 Each stage is a standalone script under `scripts/` so the human reviewer can

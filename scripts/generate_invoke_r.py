@@ -60,8 +60,16 @@ Hard requirements (no exceptions):
 - Define helpers: `emit_error(msg, fn_name = NA, code = 1L)`, `emit_ok(result, fn_name)`, `require_field(name, payload, fn_name)`.
 - Implement a `dispatch(payload)` function that switches on `payload$fn` and calls one handler per exposed function.
 - For each handler, read the JSON payload using EXACTLY the upstream R argument names listed in the UPSTREAM SIGNATURES block below. Do not rename arguments to match the SKILL.md narrative; the upstream signature is the contract. If the SKILL.md says `x` but the upstream signature lists `txt`, the JSON payload key is `txt`.
-- Coerce numeric arrays via `as.numeric(...)`, integers via `as.integer(...)`, characters via `as.character(...)`. Pass them to the wrapped function.
+- Read each argument with the local name equal to the JSON key, then assemble a `list(...)` and call the wrapped function via `do.call`. Variable names must be literal copies of the argument name. Never write `chr <- payload$charclass` and then `args$charclass <- charcharclass` (a doubled prefix is a copy-paste typo that R parses successfully but fails at runtime).
+- Type coercion follows the argument description verbatim. Read the description for each argument:
+  - "character vector" or "string", regardless of how it is used: `as.character(...)`.
+  - "integer" or "integer vector": `as.integer(...)`.
+  - "numeric" or "double": `as.numeric(...)`.
+  - "logical" or "boolean" or "TRUE/FALSE": `as.logical(...)`.
+  - "named list" or "list of options": pass the JSON object through verbatim (R parses it as a named list).
+  When the description does not state a type, default to `as.character`. Never apply `as.logical` to an argument whose description names "character vector", even when the argument name sounds like a flag.
 - For arguments documented as optional (default values present in the upstream Rd), only pass them through if `payload[[name]]` is non-NULL. Never invent default values; let R use the upstream default.
+- Multi-modal one-of arguments: when the upstream Rd lists a cluster of optional pattern-style arguments under the same group (for example `regex`, `fixed`, `coll`, `charclass` in stringi search functions), and the dispatcher also accepts a generic `pattern` field for usability, add this fallback at the bottom of the handler before the call: if `pattern` is set and none of the named modes is set, route `pattern` to the first listed mode (typically `regex`) and clear `pattern` from the arg list.
 - The result of the wrapped function goes through `emit_ok(result, fn_name)`. If the wrapped function raises, wrap the call in `tryCatch` and route the message through `emit_error`.
 - If `payload$fn` does not match any known handler, `emit_error(sprintf("Unknown fn '%s'", fn_name), fn_name)`.
 
@@ -149,6 +157,28 @@ def validate_invoke_r(text: str, package: str) -> list[str]:
         issues.append(f"no_reference_to_{package}")
     if chr(0x2014) in text:
         issues.append("contains_em_dash")
+    # Typo guard: the canonical variable in the exemplar is fn_name; Gemma
+    # occasionally drifts to fn.name which R reads as a separate identifier.
+    import re as _re
+    if _re.search(r"\bfn\.name\b", text):
+        issues.append("contains_fn_dot_name_typo")
+    # Doubled-prefix typo: e.g. `charcharclass` in place of `charclass`,
+    # `paypayload` for `payload`. R parses these without error but the
+    # variable is undefined at runtime. Catch any identifier whose first
+    # 6+ chars repeat the next 6+ chars.
+    for m in _re.finditer(r"\b([A-Za-z_][A-Za-z0-9_]{2,})\1[A-Za-z0-9_]*\b", text):
+        token = m.group(0)
+        # Allow doubled words as separate identifiers when there is a
+        # word-boundary separator (e.g. "ab_ab" is fine if intentional);
+        # only flag glued doubles like "charcharclass".
+        repeated = m.group(1)
+        if token != repeated * 2 and not token.endswith(repeated):
+            continue
+        # Permit innocuous repetitions in real R names (e.g., "tt" inside
+        # variables) by requiring the repeated chunk to be at least 4 chars.
+        if len(repeated) >= 4:
+            issues.append(f"doubled_prefix_typo:{token}")
+            break
 
     rscript = shutil.which("Rscript")
     if rscript is None:
@@ -250,7 +280,12 @@ def generate_invoke_r(
                                 wall_clock_s=time.time() - started, raw_chars=0)
     staged_meta = json.loads(meta_path.read_text(encoding="utf-8"))
     version = staged_meta.get("version") or ""
-    md = fetch_and_extract(package, version)
+    try:
+        md = fetch_and_extract(package, version)
+    except Exception as exc:
+        return GenerationResult(package=package, ok=False, output_path=None,
+                                issues=[f"fetch_failed:{type(exc).__name__}"],
+                                wall_clock_s=time.time() - started, raw_chars=0)
 
     prompt = PROMPT_TEMPLATE.format(
         package=package,
@@ -262,7 +297,12 @@ def generate_invoke_r(
     last_issues: list[str] = []
     raw_chars = 0
     for attempt in range(1, max_attempts + 1):
-        raw = call_ollama(prompt, model=model)
+        try:
+            raw = call_ollama(prompt, model=model)
+        except Exception as exc:
+            return GenerationResult(package=package, ok=False, output_path=None,
+                                    issues=[f"ollama_failed:{type(exc).__name__}"],
+                                    wall_clock_s=time.time() - started, raw_chars=0)
         raw_chars = len(raw)
         body = _strip_fences(raw)
         last_issues = validate_invoke_r(body, package)

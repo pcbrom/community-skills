@@ -1,27 +1,13 @@
-name: Propose a new skill
-description: Suggest wrapping a package as an agent-callable skill in this hub.
+name: Propose a new R skill
+description: Suggest wrapping an R package on CRAN as an agent-callable skill in this hub. The project's scope is R; Python and Julia external-package wrappers are out of scope (decision 2026-05-09).
 title: "[skill] add wrapper for <package-name>"
 labels: ["new-skill", "triage"]
 body:
   - type: input
     id: package
     attributes:
-      label: Upstream package name
+      label: Upstream R package name
       placeholder: e.g. forecast, lme4, bgumbel
-    validations:
-      required: true
-
-  - type: dropdown
-    id: runtime
-    attributes:
-      label: Runtime
-      description: The language ecosystem of the package.
-      options:
-        - R
-        - Python
-        - Julia
-        - Stata
-        - Other (specify in description)
     validations:
       required: true
 
@@ -29,7 +15,7 @@ body:
     id: package_url
     attributes:
       label: Upstream URL
-      placeholder: https://github.com/owner/repo
+      placeholder: https://github.com/owner/repo (or https://cran.r-project.org/package=<name>)
     validations:
       required: true
 

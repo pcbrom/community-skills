@@ -1,25 +1,25 @@
 # community-skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![tests](https://img.shields.io/badge/tests-pending-lightgrey.svg)](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml)
-[![Skills: 1](https://img.shields.io/badge/skills-1-blue.svg)](skills/)
+[![tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml)
+[![Skills: 94](https://img.shields.io/badge/skills-94-blue.svg)](skills/)
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](https://zenodo.org/)
 
 ## What this repository is
 
-community-skills is a hub that turns packages from any language ecosystem (R, Python, Julia, ...) into machine-readable skills that an LLM agent can invoke autonomously through a single contract: read JSON from stdin, write JSON to stdout.
+community-skills is an R-focused hub that turns CRAN packages into machine-readable skills that an LLM agent can invoke autonomously through a single contract: read JSON from stdin, write JSON to stdout. The project does not wrap Python or Julia packages and does not aim to be a multi-language registry (decision 2026-05-09).
 
 The hub ships three independent products that compose:
 
 1. **A pattern.** One pinned contract (SKILL.md + per-runtime dispatcher + shared Python bridge) that any agent harness with subprocess support can call. There is no IDE-specific dependency.
-2. **A curated gallery.** Reference skills built on the pattern, starting with [bgumbel](skills/bgumbel/) (R, +48k CRAN downloads). New skills land through community PRs and through a generation pipeline described below.
-3. **`cran_graph`.** A sub-package that builds a portable SQLite snapshot of the entire CRAN dependency graph with typed edges, machine-readable deprecation flags, and a greedy install-set optimizer.
+2. **A curated gallery of R skills.** Reference R skills built on the pattern, starting with [bgumbel](skills/bgumbel/) (+48k CRAN downloads). New R skills land through community PRs and through a generation pipeline described below.
+3. **`cran_graph` and friends.** Internal Python sub-packages that serve the R workflow: a portable SQLite snapshot of the entire CRAN dependency graph (`cran_graph`); an `R CMD check` parser, categorizer and fix loop (`cran_publisher`); and a composition skill that audits a CRAN release end-to-end (`cran_workflow`). These ship as Python-runtime skills inside `skills/` because the agent invokes them; the Python is implementation, not a competing ecosystem.
 
 ## What it is for
 
 Two independent audiences share the same repository:
 
-- **Agent operators.** A Claude Code, Codex, or OpenCode session that needs to call an R, Python, or Julia function gets a uniform `invoke(skill, payload)` interface and a documented JSON schema, instead of writing per-package glue. Examples: fit a bimodal Gumbel via [bgumbel](skills/bgumbel/), reason about CRAN dependencies via the `cran-graph` CLI, or call any future skill the gallery exposes.
+- **Agent operators.** A Claude Code, Codex, or OpenCode session that needs to call an R function gets a uniform `invoke(skill, payload)` interface and a documented JSON schema, instead of writing per-package glue. Examples: fit a bimodal Gumbel via [bgumbel](skills/bgumbel/), reason about CRAN dependencies via the [cran_graph](skills/cran_graph/) skill, run `R CMD check` and a Gemma-driven fix loop via [cran_publisher](skills/cran_publisher/), or compose the two via [cran_workflow](skills/cran_workflow/).
 - **R / CRAN operators.** Anyone who needs a queryable global graph of CRAN packages gets a SQLite file with version, license, deprecation status, and typed dependency edges, plus a CLI optimizer that resolves install sets under user-supplied constraints. The first snapshot (2026-05-09) covers 24,227 nodes and 240,075 edges and builds in about 12 seconds on a residential connection.
 
 ## What it contains
@@ -40,28 +40,42 @@ community-skills/
 │   ├── graph_schema.md          <- cran_graph schema and comparison vs pak/renv/crandep
 │   ├── optimize_examples.md     <- cran-graph optimize CLI worked examples
 │   └── skill_generation.md      <- curated CRAN-skill generation pipeline
-├── bridges/                     <- one Python adapter per runtime; shared by all skills
-│   ├── r.py                     <- subprocess + Rscript + JSON   (implemented)
-│   ├── python.py                <- placeholder                   (community PR welcome)
-│   └── julia.py                 <- placeholder                   (community PR welcome)
+├── bridges/                     <- per-runtime Python adapters
+│   ├── r.py                     <- subprocess + Rscript + JSON (canonical, all R skills)
+│   └── python.py                <- subprocess + Python + JSON (internal infra skills only)
 ├── cran_graph/                  <- queryable global CRAN graph + install-set optimizer
 │   ├── scrape.py                <- download and parse PACKAGES.gz and /Archive/
 │   ├── deprecation.py           <- four-status heuristic classifier
 │   ├── build.py                 <- NetworkX MultiDiGraph and SQLite roundtrip
 │   ├── optimize.py              <- greedy solver with version-constraint validation
-│   └── cli.py                   <- cran-graph build / stats / optimize entry points
-├── scripts/                     <- skill-generation pipeline (cranlogs + tarball + Gemma)
+│   ├── viz.py                   <- layered PNG renderer (optional matplotlib)
+│   └── cli.py                   <- cran-graph build / stats / optimize / plot entry points
+├── cran_publisher/              <- R CMD check parser + categorizer + Gemma fix loop
+│   ├── check.py                 <- subprocess wrapper around R CMD check
+│   ├── error_parser.py          <- structured CheckSummary from log
+│   ├── categorize.py            <- 15-category living taxonomy
+│   ├── agents.py                <- Gemma prompt + structured proposal parser
+│   ├── git_ops.py               <- minimal git helpers for attempt branches
+│   ├── fix_loop.py              <- per-issue attempt loop with diversified prompts
+│   ├── cost_tracker.py          <- token / dollar accounting (Gemma local: free)
+│   └── report.py                <- plain-language-first Markdown report renderer
+├── scripts/                     <- R-skill generation pipeline (cranlogs + tarball + Gemma)
 │   ├── triage_top_cran.py       <- rank top-N by downloads, cross-reference snapshot, filter
 │   ├── extract_package_metadata.py  <- parse DESCRIPTION + NAMESPACE + Rd from a tarball
-│   └── generate_skills_via_gemma.py <- prompt + Ollama + validate + write to staging
-├── skills/                      <- gallery; one subdirectory per wrapped package
+│   ├── generate_skills_via_gemma.py <- generate SKILL.md drafts
+│   ├── generate_invoke_r.py     <- generate invoke.R from staged SKILL.md + signatures
+│   └── promote_all.py           <- promote staged drafts to skills/<pkg>/ after smoke
+├── skills/                      <- gallery; one subdirectory per skill
 │   ├── README.md                <- gallery index + per-skill hierarchy
-│   ├── bgumbel/                 <- worked example, R runtime
+│   ├── bgumbel/                 <- canonical R skill (worked example)
+│   ├── cran_graph/              <- Python skill: graph build / stats / optimize / plot
+│   ├── cran_publisher/          <- Python skill: run_check / parse_log / categorize / fix_session
+│   ├── cran_workflow/           <- Python skill: composition of cran_graph + cran_publisher
+│   ├── autoresearch/            <- Python skill: autonomous optimization loop (Phase 6 anchor)
+│   ├── glue/, jsonlite/, ...    <- 88 R skills promoted from staging
 │   └── _staging/                <- LLM-generated drafts awaiting human review (gitignored)
 ├── templates/
-│   ├── new_r_skill/             <- copy-paste scaffold for a new R skill
-│   ├── new_python_skill/        <- placeholder
-│   └── new_julia_skill/         <- placeholder
+│   └── new_r_skill/             <- copy-paste scaffold for a new R skill
 ├── tests/                       <- pytest matrix; CI runs setup R + install + run
 └── .github/
     ├── workflows/ci.yml         <- GitHub Actions: setup R, install bgumbel, pytest
@@ -74,11 +88,10 @@ The community-facing path is to read this `README.md`, then [`skills/README.md`]
 
 Each `skills/<name>/` directory contains:
 
-- `SKILL.md`: a YAML front matter declaring the runtime (`r`, `python`, `julia`, ...) plus a body that lists each exposed function with input and output JSON schemas.
-- `invoke.<ext>`: a dispatcher in the package's native language. It reads one JSON object from stdin, routes on the `fn` field, calls the wrapped function, writes one JSON object to stdout.
-- `invoke.py`: an optional Python wrapper that re-exports the skill via the appropriate bridge.
+- `SKILL.md`: a YAML front matter declaring the runtime (`r` or `python`) plus a body that lists each exposed function with input and output JSON schemas.
+- `invoke.R` or `invoke.py`: a dispatcher in the package's native language. It reads one JSON object from stdin, routes on the `fn` field, calls the wrapped function, writes one JSON object to stdout.
 
-Each `bridges/<runtime>.py` is a thin Python adapter that spawns the runtime, sends the JSON payload, and parses the response. Today, `bridges/r.py` is implemented; `bridges/python.py` and `bridges/julia.py` raise `NotImplementedError` and link to the issue tracker for community contribution.
+Each `bridges/<runtime>.py` is a thin Python adapter that spawns the runtime, sends the JSON payload, and parses the response. `bridges/r.py` is the canonical bridge and handles every CRAN package wrapped by the hub. `bridges/python.py` exists to run the project's in-tree Python infrastructure skills (`cran_graph`, `cran_publisher`, `cran_workflow`, `autoresearch`); it is not a general-purpose bridge for arbitrary Python packages. Julia is intentionally out of scope.
 
 ```
 +--------------+      JSON        +-----------+      stdin/stdout        +----------+
@@ -153,23 +166,35 @@ Each draft lands in `skills/_staging/<package>/SKILL.md` with a sibling `_meta.j
 
 ## Available skills
 
-| Skill | Runtime | Wraps | Functions | First release |
-|---|---|---|---|---|
-| [bgumbel](skills/bgumbel/) | R | [bgumbel](https://github.com/pcbrom/bgumbel) (CRAN, ~48K downloads, 10 citing papers) | `dbgumbel`, `pbgumbel`, `qbgumbel`, `rbgumbel`, `m1bgumbel`, `m2bgumbel`, `mlebgumbel` | v0.1.0 |
+The gallery has 94 skills as of 2026-05-11.
 
-Additional skills are in `skills/_staging/` awaiting review. The full list with status flags is at [`skills/README.md`](skills/README.md).
+### Core skills (curated, all-in)
 
-## Porting a package to the hub (5 steps)
+| Skill | Runtime | Role | First release |
+|---|---|---|---|
+| [bgumbel](skills/bgumbel/) | R | canonical R reference; 7 functions over the bimodal Gumbel distribution | v0.1.0 |
+| [cran_graph](skills/cran_graph/) | Python | global CRAN graph and install-set optimizer | v0.2.0 |
+| [cran_publisher](skills/cran_publisher/) | Python | `R CMD check` parser, categorizer and Gemma-driven fix loop | v0.2.0 |
+| [cran_workflow](skills/cran_workflow/) | Python | composition of `cran_graph` plus `cran_publisher`: audit a CRAN release end-to-end | v0.2.0 |
+| [autoresearch](skills/autoresearch/) | Python | autonomous optimization loop with a local LLM critic; Phase 6 anchor | v0.2.0 |
 
-The recipe is the same regardless of the upstream package's language. The bgumbel skill is the worked example; [`docs/adding_r_skill.md`](docs/adding_r_skill.md) walks the steps in detail.
+### CRAN top-100 (LLM-drafted, staging-then-promoted)
+
+89 R skills drafted with Gemma 4 26b-fast from the cranlogs top-100 of the last month and promoted after structural smoke validation. Examples: `dplyr`, `ggplot2`, `rlang`, `tibble`, `vctrs`, `purrr`, `stringr`, `cli`, `glue`, `Rcpp`. The full list and the audit results live at [`skills/README.md`](skills/README.md).
+
+One CRAN top-100 package (`rmarkdown`) carries 94 exports and exceeds the auto-generator's reliable window; the draft remains in `skills/_staging/rmarkdown/` pending a hand-written dispatcher with a smaller exposed surface.
+
+## Porting an R package to the hub (5 steps)
+
+The bgumbel skill is the worked example; [`docs/adding_r_skill.md`](docs/adding_r_skill.md) walks the steps in detail.
 
 1. **Pick the package and the surface.** Choose a permissive license (MIT, Apache 2, BSD, GPL-compatible). List the 3 to 15 functions an agent will plausibly call. Skills do not need to expose every public function of the upstream package.
-2. **Copy the scaffold.** From the repo root: `cp -r templates/new_r_skill skills/<your-name>` (or `new_python_skill`, `new_julia_skill` once those bridges land).
-3. **Fill `SKILL.md`.** Front matter declares `runtime`, `package`, `license`, `maintainer`. The body lists each exposed function with input and output JSON schemas plus a worked example.
-4. **Adapt `invoke.<ext>`.** Read one JSON object from stdin, route on the `fn` field, call the wrapped function, write one JSON object to stdout. On failure write `{"ok": false, "error": "..."}` and exit non-zero.
+2. **Copy the scaffold.** From the repo root: `cp -r templates/new_r_skill skills/<your-name>`.
+3. **Fill `SKILL.md`.** Front matter declares `runtime: r`, `package`, `license`, `maintainer`. The body lists each exposed function with input and output JSON schemas plus a worked example.
+4. **Adapt `invoke.R`.** Read one JSON object from stdin, route on the `fn` field, call the wrapped function, write one JSON object to stdout. On failure write `{"ok": false, "error": "..."}` and exit non-zero.
 5. **Add a smoke test and open a PR.** Drop a file under `tests/test_skills/test_<your-name>.py`. The CI workflow installs the upstream package, runs your test, and gates the merge.
 
-The `bridges/<runtime>.py` adapter is shared across all skills of the same runtime; you do not write a new one for your skill.
+`bridges/r.py` is shared across all R skills; you do not write a new bridge for your skill.
 
 ## Running tests
 
@@ -178,15 +203,15 @@ pip install -e ".[dev]"
 python -m pytest tests/ -v
 ```
 
-Network-bound tests (full CRAN download, Ollama call) are skipped by default and gated behind `CRAN_GRAPH_NETWORK=1`.
+Network-bound tests (full CRAN download, Ollama call) are skipped by default and gated behind `CRAN_GRAPH_NETWORK=1`. Per-skill smoke tests under `tests/test_skills/` are skipped automatically when the upstream R package is not installed locally; CI installs the relevant subset and runs them green. Current status: 182 passed, 128 skipped on 2026-05-11.
 
 ## Roadmap
 
 | Version | Planned content |
 |---|---|
 | v0.1.0 (2026-05-06) | Pattern + R bridge + bgumbel skill. |
-| v0.2.0+ | `cran_graph` (graph + optimizer) and the first wave of curated CRAN skills generated through the staging pipeline; each promoted skill ships in its own minor release with its own Zenodo DOI. |
-| ongoing | Each merged PR that adds a skill or bridge ships in a minor release. Python and Julia bridges are open community contributions. |
+| v0.2.0+ | `cran_graph` + `cran_publisher` + `cran_workflow` (internal Python infra exposed as agent-callable skills) + the first wave of curated CRAN R skills generated through the staging pipeline; each promoted skill ships in its own minor release with its own Zenodo DOI. |
+| ongoing | Each merged PR that adds an R skill ships in a minor release. The scope is R; Python and Julia external-package wrappers are out of scope (decision 2026-05-09). |
 
 Acceptance criteria for new skills are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -195,7 +220,7 @@ Acceptance criteria for new skills are in [CONTRIBUTING.md](CONTRIBUTING.md).
 This hub continues a line of agent-tooling work by the maintainer:
 
 - [autoresearch](https://github.com/pcbrom/autoresearch) (DOI [10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195)) generalizes the autonomous research loop pattern released by [Andrej Karpathy](https://github.com/karpathy/autoresearch) as a Python package, with a JSON-Schema-constrained LLM critic.
-- community-skills generalizes the *package-as-skill* pattern across language ecosystems, with the same emphasis on machine-readable contracts and subprocess-level isolation.
+- community-skills applies the *package-as-skill* pattern to the CRAN ecosystem, with the same emphasis on machine-readable contracts and subprocess-level isolation.
 
 ## Citation
 

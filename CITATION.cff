@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use community-skills in your work, please cite as below."
-title: "community-skills: A community hub for wrapping packages as agent-callable skills"
-version: 0.1.0
-date-released: "2026-05-06"
+title: "community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem"
+version: 0.2.0
+date-released: "2026-05-11"
 authors:
   - family-names: "Brom"
     given-names: "Pedro Carvalho"
@@ -14,9 +14,10 @@ type: software
 keywords:
   - "agentic coding"
   - "LLM skills"
-  - "package wrapping"
-  - "R"
   - "CRAN"
+  - "R packages"
+  - "dependency graph"
+  - "R CMD check"
   - "subprocess bridge"
   - "JSON schema"
   - "machine-readable contract"

@@ -1,14 +1,14 @@
 # Contributing to community-skills
 
-Thanks for considering a contribution. This hub grows by accumulating skills from the community: each new skill makes more packages reachable to LLM agents (Claude Code, Codex, OpenCode, and any tool that can spawn a subprocess and exchange JSON).
+Thanks for considering a contribution. This hub grows by accumulating R skills from the community: each new skill makes more CRAN packages reachable to LLM agents (Claude Code, Codex, OpenCode, and any tool that can spawn a subprocess and exchange JSON).
 
 ## Scope
 
-A community-skills entry wraps an existing package from a programming-language ecosystem (R, Python, Julia, Stata, ...) so that an agent can invoke its functions without writing custom glue. The hub is intentionally **agent-agnostic**: contributions must not depend on the internals of any particular IDE or harness.
+A community-skills entry wraps an existing R package on CRAN so that an agent can invoke its functions without writing custom glue. The hub is intentionally **agent-agnostic**: contributions must not depend on the internals of any particular IDE or harness.
 
-## Adding a new skill (5 steps)
+Scope decision (2026-05-09): this project is R-focused. Wrappers for Python or Julia packages are out of scope. The `python` runtime in `bridges/python.py` exists only for the project's in-tree infrastructure skills (`cran_graph`, `cran_publisher`, `cran_workflow`, `autoresearch`) that serve the R workflow; community PRs that add Python-runtime skills for arbitrary Python packages will not be accepted.
 
-The recipe below targets an R package. Python and Julia bridges are placeholders today; PRs that implement either bridge are also welcome.
+## Adding a new R skill (5 steps)
 
 1. **Pick a package**. It must have a permissive license (MIT, BSD, Apache 2, GPL-compatible) and a small, well-defined surface (3-15 functions). Open an [`new_skill` issue](.github/ISSUE_TEMPLATE/new_skill.yml) first if you want to discuss the choice.
 2. **Copy the scaffold**. From the repo root: `cp -r templates/new_r_skill skills/<your-skill-name>`. Replace `your-skill-name` with the package's CRAN name in lowercase.
@@ -17,17 +17,6 @@ The recipe below targets an R package. Python and Julia bridges are placeholders
 5. **Add a smoke test**. Drop a file under `tests/test_skills/test_<your-skill-name>.py` mirroring `tests/test_skills/test_bgumbel.py`. The test should call the bridge end-to-end and check at least one nontrivial input/output pair.
 
 Open a pull request. CI runs setup R, installs the wrapped package, and executes pytest. Once it is green, the maintainer reviews and merges.
-
-## Adding a new bridge
-
-Implementing the Python or Julia bridge follows the same pattern as `bridges/r.py`:
-
-- Read JSON from stdin.
-- Spawn the runtime's interpreter in a subprocess (Python, Julia).
-- The interpreter reads JSON, dispatches on `fn`, calls the wrapped function, writes JSON to stdout.
-- Capture stderr and exit codes; surface failures through `{"ok": false, "error": "..."}`.
-
-Open a `new_bridge` discussion issue first so the API stays consistent across runtimes.
 
 ## Style and conventions
 

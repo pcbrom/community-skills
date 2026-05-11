@@ -36,11 +36,21 @@ benefits are immediate:
 - **Manual debuggability**: a developer can run
   `Rscript --vanilla skills/bgumbel/invoke.R < payload.json` and inspect
   the result without touching the agent harness.
-- **Same pattern across languages**: the contract for an R skill, a
-  Python skill, and a Julia skill is identical. Only the bridge changes.
+- **Same pattern across runtimes**: an R skill and a Python in-tree
+  infrastructure skill share the same contract; only the bridge changes.
 
 When a skill becomes hot enough that spawn cost matters, an embedded bridge
 can be added as an optional accelerator without breaking the JSON contract.
+
+## Why R-only as a scope decision (2026-05-09)
+
+The project deliberately limits its public scope to CRAN packages. The
+Python runtime exists in `bridges/python.py` and inside `skills/` only
+because the hub's own infrastructure (`cran_graph`, `cran_publisher`,
+`cran_workflow`, `autoresearch`) is written in Python and the agent
+invokes those modules through the same JSON contract; treating them as
+skills keeps the dispatcher surface uniform. Wrappers for arbitrary
+Python or Julia packages are out of scope.
 
 ## Why one bridge per runtime instead of per skill
 
@@ -48,8 +58,8 @@ Bridges live in `bridges/<runtime>.py` so that every skill of a given
 runtime shares the same dispatcher logic: payload validation, subprocess
 spawn, stderr capture, timeout, JSON parsing, and graceful error reporting.
 A skill author writes only the dispatcher in the package's native language
-(`invoke.R`, `invoke.py`, `invoke.jl`) plus a `SKILL.md`, and inherits the
-hardened bridge for free.
+(`invoke.R` for an R skill, `invoke.py` for an in-tree Python infra skill)
+plus a `SKILL.md`, and inherits the hardened bridge for free.
 
 ## Why JSON instead of binary or RPC
 
@@ -66,6 +76,6 @@ JSON is fast enough.
 - It does not ship a hosting layer. There is no daemon, no socket, no
   RPC server. Each call is a fresh subprocess.
 - It does not virtualize the upstream package. R is invoked from the
-  system R; Python skills will use the system or chosen virtualenv;
-  Julia, the system Julia. Reproducibility relies on documenting the
-  upstream version in `SKILL.md` front matter.
+  system R; Python in-tree skills run in the host interpreter
+  (`sys.executable`). Reproducibility relies on documenting the upstream
+  version in `SKILL.md` front matter.

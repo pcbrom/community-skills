@@ -1,0 +1,136 @@
+#!/usr/bin/env Rscript
+# promises skill dispatcher.
+# Reads one JSON object from stdin, invokes the requested promises function,
+# and writes one JSON object to stdout. Errors are reported as
+# {"ok": false, "error": "..."} with non-zero exit code.
+
+# Redirect any R-level output to stderr so the only thing on stdout is the final JSON.
+sink(stderr(), type = "output")
+
+suppressPackageStartupMessages({
+  ok_jsonlite <- requireNamespace("jsonlite", quietly = TRUE)
+  ok_promises <- requireNamespace("promises", quietly = TRUE)
+})
+
+emit_error <- function(message_text, fn_name = NA_character_, code = 1L) {
+  payload <- list(ok = FALSE, error = unname(message_text))
+  if (!is.na(fn_name)) payload$fn <- fn_name
+  sink(NULL, type = "output")  # restore stdout before writing the final JSON
+  if (ok_jsonlite) {
+    cat(jsonlite::toJSON(payload, auto_unbox = TRUE, na = "null"))
+  } else {
+    cat(sprintf('{"ok":false,"error":%s}',
+                shQuote(message_text, type = "cmd")))
+  }
+  cat("\n")
+  quit(status = code, save = "no")
+}
+
+if (!ok_jsonlite) {
+  emit_error(
+    paste(
+      "The R package 'jsonlite' is required by the promises skill but is not",
+      "installed. Run: install.packages('jsonlite')."
+    )
+  )
+}
+
+if (!ok_promises) {
+  emit_error(
+    paste(
+      "The R package 'promises' is required but is not installed.",
+      "Run: install.packages('promises')."
+    )
+  )
+}
+
+stdin_text <- paste(readLines("stdin", warn = FALSE), collapse = "\n")
+if (!nzchar(stdin_text)) {
+  emit_error("No JSON payload received on stdin.")
+}
+
+payload <- tryCatch(
+  jsonlite::fromJSON(stdin_text, simplifyVector = TRUE),
+  error = function(e) emit_error(paste0("Invalid JSON on stdin: ", conditionMessage(e)))
+)
+
+fn_name <- payload$fn
+if (is.null(fn_name) || !nzchar(fn_name)) {
+  emit_error("Field `fn` is required.")
+}
+
+emit_ok <- function(result, fn_name) {
+  sink(NULL, type = "output")  # restore stdout before writing the final JSON
+  cat(jsonlite::toJSON(
+    list(ok = TRUE, fn = unname(fn_name), result = result),
+    auto_unbox = TRUE, na = "null", digits = 12
+  ))
+  cat("\n")
+}
+
+require_field <- function(name, payload, fn_name) {
+  if (is.null(payload[[name]])) {
+    emit_error(sprintf("Field `%s` is required for fn=%s.", name, fn_name))
+  }
+  payload[[name]]
+}
+
+dispatch <- function(payload) {
+  fn_name <- payload$fn
+  
+  if (fn_name == "future_promise_queue") {
+    expr <- payload$expr
+    envir <- if (is.null(payload$envir)) NULL else payload$envir
+    substitute_arg <- if (is.null(payload$substitute)) FALSE else isTRUE(payload$subrypt)
+    queue <- if (is.null(payload$queue)) NULL else payload$queue
+    
+    # Handle extra parameters for future()
+    extra_args <- list()
+    for (arg in names(payload)) {
+      if (!(arg %in% c("fn", "expr", "envir", "substitute", "queue"))) {
+        extra_args[[arg]] <- payload[[arg]]
+      }
+    }
+    
+    out <- promises::future_promise_queue(
+      expr = expr, 
+      envir = envir, 
+      substitute = substitute_arg, 
+      queue = queue,
+      ... = extra_args
+    )
+    emit_ok(as.character(out), fn_name)
+
+  } else if (fn_name == "hybrid_then") {
+    expr <- payload$expr
+    on_success <- payload$on_success
+    on_failure <- payload$on_failure
+    tee <- if (is.null(payload$tee)) FALSE else isTRUE(payload$tee)
+    
+    out <- promises::hybrid_then(
+      expr = expr,
+      on_success = on_success,
+      on_failure = on_failure,
+      tee = tee
+    )
+    emit_ok(as.character(out), fn_name)
+
+  } else if (fn_name == "is.promise") {
+    x <- payload$x
+    out <- promises::is.promise(x)
+    emit_ok(as.logical(out), fn_name)
+
+  } else if (fn_name == "promise") {
+    action <- payload$action
+    out <- promises::promise(action = action)
+    emit_ok(as.character(out), fn_name)
+
+  } else {
+    emit_error(sprintf("Unknown fn '%s'", fn_name), fn_name)
+  }
+}
+
+err <- tryCatch(dispatch(payload), error = function(e) e)
+if (inherits(err, "error")) {
+  emit_error(conditionMessage(err), fn_name)
+}

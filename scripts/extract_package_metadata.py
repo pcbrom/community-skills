@@ -69,12 +69,39 @@ class PackageMetadata:
 # --------------------------------------------------------------------------- #
 
 
-def fetch_tarball(package: str, version: str, timeout: float = DEFAULT_TIMEOUT_SECONDS) -> bytes:
-    """Download the source tarball for ``package`` at ``version``."""
+def fetch_tarball(
+    package: str,
+    version: str,
+    timeout: float = DEFAULT_TIMEOUT_SECONDS,
+    *,
+    max_attempts: int = 3,
+) -> bytes:
+    """Download the source tarball for ``package`` at ``version``.
+
+    Retries up to ``max_attempts`` times on connection / chunked-encoding
+    failures, with a short backoff. CRAN occasionally truncates large
+    tarballs mid-stream; the loop covers that without burdening the
+    caller.
+    """
     url = CRAN_TARBALL_URL.format(package=package, version=version)
-    response = requests.get(url, timeout=timeout, headers={"User-Agent": USER_AGENT})
-    response.raise_for_status()
-    return response.content
+    last_exc: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(
+                url, timeout=timeout, headers={"User-Agent": USER_AGENT},
+            )
+            response.raise_for_status()
+            return response.content
+        except (requests.exceptions.ChunkedEncodingError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.ReadTimeout) as exc:
+            last_exc = exc
+            if attempt < max_attempts:
+                import time as _time
+                _time.sleep(2 * attempt)
+                continue
+    assert last_exc is not None
+    raise last_exc
 
 
 # --------------------------------------------------------------------------- #

@@ -1,6 +1,6 @@
 {
-    "title": "community-skills: A community hub for wrapping packages as agent-callable skills (v0.1.0)",
-    "description": "community-skills is a public hub for exposing packages from any language ecosystem (R, Python, Julia, Stata, ...) as machine-readable skills that LLM agents (Claude Code, Codex, OpenCode, third-party tools) can invoke autonomously. Each skill ships a SKILL.md contract (function-level schemas), an invoke script in the package's native language, and a thin per-runtime bridge (subprocess + JSON) that any agent harness can drive. v0.1.0 implements the R bridge and ships bgumbel (Otiniano, Vila, Brom, Bourguignon 2023; ~48,000 CRAN downloads; 10 citing papers) as the canonical first skill, with placeholders for Python and Julia bridges to be contributed by the community. The repo is independent of any particular agent runtime: it requires only that the calling environment can spawn a subprocess and exchange JSON.",
+    "title": "community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0)",
+    "description": "community-skills is an R-focused hub that turns CRAN packages into machine-readable skills that LLM agents (Claude Code, Codex, OpenCode, third-party tools) can invoke autonomously. Each skill ships a SKILL.md contract (function-level schemas), an invoke dispatcher (invoke.R for CRAN packages, invoke.py for in-tree infrastructure), and a thin per-runtime bridge (subprocess + JSON) that any agent harness can drive. v0.2.0 ships: (a) cran_graph, a portable SQLite snapshot of the entire CRAN dependency graph with typed edges and machine-readable deprecation flags plus a greedy install-set optimizer; (b) cran_publisher, an R CMD check parser, categorizer, and a Gemma-driven fix loop with structured Markdown reports; (c) cran_workflow, a composition skill that audits a CRAN release end-to-end; (d) autoresearch, an autonomous optimization loop with a local LLM critic; (e) bgumbel as the canonical wrapped CRAN package (Otiniano, Vila, Brom, Bourguignon 2023; ~48,000 CRAN downloads; 10 citing papers); and (f) 88 additional R skills drafted by Gemma 4 26b-fast from the cranlogs top-100 and promoted after structural smoke validation. Project scope is R; Python and Julia external-package wrappers are out of scope (decision 2026-05-09).",
     "upload_type": "software",
     "creators": [
         {
@@ -12,11 +12,11 @@
     "keywords": [
         "agentic coding",
         "LLM skills",
-        "package wrapping",
-        "R",
         "CRAN",
-        "Python",
-        "Julia",
+        "R",
+        "dependency graph",
+        "R CMD check",
+        "package wrapping",
         "subprocess bridge",
         "JSON schema",
         "machine-readable contract",

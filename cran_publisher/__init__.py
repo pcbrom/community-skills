@@ -17,6 +17,18 @@ modules; see the sprint plan for the full sequence.
 """
 from __future__ import annotations
 
+from .agents import (
+    EditProposal,
+    FixProposal,
+    apply_proposal,
+    build_prompt,
+    parse_proposal,
+)
+from .cost_tracker import (
+    CallRecord,
+    ClaudePricing,
+    CostTracker,
+)
 from .categorize import (
     Category,
     CategorizedIssue,
@@ -43,28 +55,51 @@ from .error_parser import (
     parse_check_log,
     parse_issues,
 )
+from .fix_loop import (
+    FixAttempt,
+    FixSession,
+    attempt_fix,
+    fix_session,
+    run_full_session,
+)
+from .report import ReportInputs, render_report
 
 __version__ = "0.1.0"
 
 __all__ = [
+    "CallRecord",
     "Category",
     "CategorizedIssue",
     "CategorizedSummary",
     "CheckIssue",
     "CheckResult",
     "CheckSummary",
+    "ClaudePricing",
+    "CostTracker",
     "DEFAULT_CHECK_FLAGS",
     "DEFAULT_TIMEOUT_SECONDS",
+    "EditProposal",
+    "FixAttempt",
+    "FixProposal",
+    "FixSession",
+    "ReportInputs",
     "VERDICT_ERROR",
     "VERDICT_NOTE",
     "VERDICT_OK",
     "VERDICT_UNKNOWN",
     "VERDICT_WARNING",
+    "apply_proposal",
+    "attempt_fix",
+    "build_prompt",
     "classify_issue",
     "classify_summary",
+    "fix_session",
     "issues_by_verdict",
     "load_taxonomy",
     "parse_check_log",
     "parse_issues",
+    "parse_proposal",
+    "render_report",
     "run_check",
+    "run_full_session",
 ]

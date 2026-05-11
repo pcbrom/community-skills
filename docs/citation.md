@@ -13,9 +13,9 @@ GitHub renders it under "Cite this repository" on the project page.
 ```bibtex
 @software{brom2026community_skills,
   author       = {Brom, Pedro Carvalho and contributors},
-  title        = {community-skills: A community hub for wrapping packages as agent-callable skills},
-  version      = {0.1.0},
-  date         = {2026-05-06},
+  title        = {community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem},
+  version      = {0.2.0},
+  date         = {2026-05-11},
   publisher    = {Zenodo},
   doi          = {<DOI assigned at first release>},
   url          = {https://github.com/pcbrom/community-skills}
@@ -24,7 +24,7 @@ GitHub renders it under "Cite this repository" on the project page.
 
 ### APA
 
-> Brom, P. C., & contributors. (2026). *community-skills: A community hub for wrapping packages as agent-callable skills* (Version 0.1.0) [Computer software]. Zenodo. https://doi.org/<DOI>
+> Brom, P. C., & contributors. (2026). *community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem* (Version 0.2.0) [Computer software]. Zenodo. https://doi.org/<DOI>
 
 ## Citing a specific skill
 

@@ -20,11 +20,11 @@ server, no shared state between calls.
               +------+------+
               |             |
               v             v
-+-------------+--+   +------+--------+   +-------+--------+
-| bridges/r.py   |   | bridges/      |   | bridges/       |
-| (implemented)  |   |  python.py    |   |  julia.py      |
-|                |   | (placeholder) |   | (placeholder)  |
-+--------|-------+   +---------------+   +----------------+
++-------------+--+   +------+--------+
+| bridges/r.py   |   | bridges/      |
+| (canonical;    |   |  python.py    |
+|  all CRAN pkg) |   | (in-tree only)|
++--------|-------+   +---------------+
          |
          |  subprocess.run([Rscript, invoke.R], stdin=json, capture stdout)
          v

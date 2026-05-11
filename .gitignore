@@ -1,47 +1,79 @@
-# Python
+# =========================================================================
+# .gitignore for community-skills
+#
+# Two groups, separated and labelled:
+#   1. Standard exclusions: language/OS/IDE artefacts every clone of this
+#      repo should ignore. These are part of the "repo contract".
+#   2. Local-only exclusions: paths that are operator-specific, contain
+#      session state, or carry large artefacts that ship through release
+#      channels (GitHub releases, Zenodo) rather than git history. Other
+#      contributors will not have these paths; nothing in this group is
+#      part of the repo contract.
+# =========================================================================
+
+
+# -------------------------------------------------------------------------
+# 1. Standard exclusions (part of the repo contract)
+# -------------------------------------------------------------------------
+
+# Python build artefacts
 __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
+*.egg
+build/
+dist/
 .pytest_cache/
 .coverage
 htmlcov/
-build/
-dist/
-*.egg
 .venv/
 venv/
 
-# OS
+# R session artefacts produced by Rscript / RStudio
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck/
+bgumbel.Rcheck/
+
+# Operating system metadata
 .DS_Store
 Thumbs.db
 
-# IDE
+# Editor / IDE metadata
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# R
-.Rhistory
-.RData
-.Ruserdata
 
-# Local-only
+# -------------------------------------------------------------------------
+# 2. Local-only exclusions (operator-specific, not part of the repo contract)
+# -------------------------------------------------------------------------
+
+# Free-form workbench directories the operator may create at will
 /local/
 /scratch/
 *.tmp
 *.bak
-*~
+
+# Per-operator session state from Claude Code and similar agent harnesses
 CLAUDE.md
 BRIEFING.md
 .claude/
 
-# cran_graph snapshots (large binary; share via release/Zenodo)
+# Large cran_graph snapshots (binaries; ship via GitHub release or Zenodo)
 /data/
 *.sqlite
 *.sqlite-journal
 
-# Skill generation staging (LLM output awaiting human review)
+# LLM-generated SKILL.md drafts awaiting human review (the gallery only
+# carries dispatchers that already passed the promotion gate; drafts that
+# have not are operator-local until promoted by hand)
 /skills/_staging/
+
+# Local checkouts of external CRAN packages used as test fixtures
+# (e.g. cran_graph_extra/bgumbel/ for the cran_publisher smoke test)
 /cran_graph_extra/

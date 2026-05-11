@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "community-skills"
-version = "0.1.0"
-description = "A community hub for wrapping packages as agent-callable skills (R, Python, Julia, ...)."
+version = "0.2.0"
+description = "An R-focused hub of agent-callable skills for the CRAN ecosystem, with internal Python infrastructure (cran_graph, cran_publisher, cran_workflow, autoresearch)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -13,7 +13,10 @@ authors = [{ name = "Pedro Carvalho Brom", email = "pcbrom@gmail.com" }]
 keywords = [
     "agentic-coding",
     "llm-skills",
-    "package-wrapping",
+    "cran",
+    "r-packages",
+    "dependency-graph",
+    "r-cmd-check",
     "subprocess-bridge",
     "json-schema",
     "claude-code",

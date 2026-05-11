@@ -53,6 +53,13 @@ def invoke(skill: str, payload: dict[str, Any]) -> dict[str, Any]:
     dict
         Always contains `ok: bool`. On success, also `fn: str` and `result: Any`.
         On failure, also `error: str`.
+
+    Notes
+    -----
+    Supported runtimes today: ``r`` (canonical, all wrapped CRAN packages)
+    and ``python`` (in-tree infra skills such as ``cran_graph`` and
+    ``cran_publisher`` that serve the R workflow). Julia is intentionally
+    out of scope for this project (decided 2026-05-09).
     """
     skill_dir = SKILLS_DIR / skill
     if not skill_dir.is_dir():
@@ -69,15 +76,12 @@ def invoke(skill: str, payload: dict[str, Any]) -> dict[str, Any]:
     if runtime == "python":
         from .python import invoke as _invoke_py
         return _invoke_py(skill_dir, payload)
-    if runtime == "julia":
-        from .julia import invoke as _invoke_jl
-        return _invoke_jl(skill_dir, payload)
 
     return {
         "ok": False,
         "error": (
             f"unknown runtime '{runtime}' declared in {skill_md}. "
-            f"Supported: r, python, julia."
+            f"Supported: r, python."
         ),
     }
 
