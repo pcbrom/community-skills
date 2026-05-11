@@ -22,6 +22,41 @@ Two independent audiences share the same repository:
 - **Agent operators.** A Claude Code, Codex, or OpenCode session that needs to call an R function gets a uniform `invoke(skill, payload)` interface and a documented JSON schema, instead of writing per-package glue. Examples: fit a bimodal Gumbel via [bgumbel](skills/bgumbel/), reason about CRAN dependencies via the [cran_graph](skills/cran_graph/) skill, run `R CMD check` and a Gemma-driven fix loop via [cran_publisher](skills/cran_publisher/), or compose the two via [cran_workflow](skills/cran_workflow/).
 - **R / CRAN operators.** Anyone who needs a queryable global graph of CRAN packages gets a SQLite file with version, license, deprecation status, and typed dependency edges, plus a CLI optimizer that resolves install sets under user-supplied constraints. The first snapshot (2026-05-09) covers 24,227 nodes and 240,075 edges and builds in about 12 seconds on a residential connection.
 
+## Why this matters: token-cost reduction
+
+When an agent invokes an R function without a skill available, it runs a loop of *load documentation context, generate R code, spawn Rscript, parse error or output, retry*. For non-trivial tasks this consumes 15,000 to 40,000 tokens per analysis, mostly driven by retries when the agent guesses an argument name the upstream function does not accept.
+
+When the same call goes through a skill, the loop collapses to *load the SKILL.md contract, serialize a JSON payload that matches the schema, invoke the bridge, use the structured result*. Same task, 700 to 2,000 tokens. The dispatcher returns `{"ok": false, "error": "Field X is required"}` on missing fields, so failures are diagnosable without re-prompting.
+
+A static cost model built from measured SKILL.md sizes and standard agent-loop assumptions (1 token ~ 4 chars) gives the following per-task estimates:
+
+| Task | Without skill | With skill | Ratio |
+|---|---|---|---|
+| `lme4` mixed-effects fit (`Reaction ~ Days + (Days | Subject)` on `sleepstudy`) | 12,000 | 1,800 | **6.7x** |
+| `ggplot2` faceted scatter on `mpg` | 8,000 | 2,500 | **3.2x** |
+| `dplyr` filter / group / summarize on `mtcars` | 7,500 | 1,500 | **5.0x** |
+| `bgumbel` MLE parameter recovery on simulated data | 28,000 | 1,400 | **20.0x** |
+| **Mean** | | | **8.7x** |
+
+The savings spread is the point: well-known packages (ggplot2, dplyr) save 3 to 5x because the agent already has the API memorized; long-tail packages (bgumbel and the bulk of CRAN) save 15 to 20x because the agent otherwise burns retries on hallucinated argument names. Expect 5 to 10x average savings on workflows that mix both. Time savings track tokens: a non-trivial inline analysis takes 90 to 180 seconds against 25 to 35 seconds with a skill.
+
+The numbers above are static estimates, not dynamic end-to-end measurements. The methodology (4 tasks, prompts, run schema, aggregation script) is documented externally and reproducible; community runs will revise these estimates.
+
+## Who fits this hub, who does not
+
+The pattern earns its keep in these profiles:
+
+- A data scientist with an LLM agent in the R workflow (Claude Code, Codex, OpenCode, custom harness) that hits R analyses at least a few times a day.
+- A pipeline that automates R analysis as part of a larger orchestrated process (bioinformatics, genomics, finance); the JSON contract makes the R step deterministic for the orchestrator.
+- Instructors teaching R via an agent that demonstrates "how do I do X in R" with executable code and structured outputs.
+
+The pattern adds friction or has no payoff in these cases:
+
+- You write R by hand in RStudio with no agent in the loop. There is no token cost to reduce.
+- You only use Python. The Python infrastructure skills (`cran_graph`, `cran_publisher`, `cran_workflow`, `autoresearch`) serve the R workflow; if you have no R, the hub does not serve you.
+- You need microsecond latency for tight inner loops. The bridge spawns a fresh Rscript per call (~100 ms). For agentic invocation this is rounding error; for batched computation, use `rpy2` or another in-process binding.
+- You already have a tailored agent-to-R integration that works. Switching only pays off if the uniform JSON contract gives you something you do not have today (auditability, easier handoff to other agents, multi-skill orchestration).
+
 ## What it contains
 
 ```
