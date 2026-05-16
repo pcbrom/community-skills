@@ -32,7 +32,7 @@ A static cost model built from measured SKILL.md sizes and standard agent-loop a
 
 | Task | Without skill | With skill | Ratio |
 |---|---|---|---|
-| `lme4` mixed-effects fit (`Reaction ~ Days + (Days | Subject)` on `sleepstudy`) | 12,000 | 1,800 | **6.7x** |
+| `lme4` mixed-effects fit (`Reaction ~ Days + (Days \| Subject)` on `sleepstudy`) | 12,000 | 1,800 | **6.7x** |
 | `ggplot2` faceted scatter on `mpg` | 8,000 | 2,500 | **3.2x** |
 | `dplyr` filter / group / summarize on `mtcars` | 7,500 | 1,500 | **5.0x** |
 | `bgumbel` MLE parameter recovery on simulated data | 28,000 | 1,400 | **20.0x** |
