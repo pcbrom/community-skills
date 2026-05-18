@@ -268,6 +268,16 @@ BUILTIN_TAXONOMY: list[dict] = [
         ],
     },
     {
+        "key": "multicore",
+        "label": "Uses more than two cores during the check (CPU time exceeds elapsed)",
+        "patterns": [
+            r"CPU time [0-9.]+ times elapsed",
+            r"had CPU time",
+            r"using more than .* cores",
+            r"checking .* number of cores",
+        ],
+    },
+    {
         "key": "incoming_feasibility",
         "label": "CRAN incoming feasibility (initial submission gate)",
         "patterns": [

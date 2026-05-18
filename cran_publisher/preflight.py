@@ -166,7 +166,11 @@ def submission_preflight(
             else "License field names 'file LICENSE' but the file is absent",
         ))
 
-    # Gate: the last R CMD check, when its log was supplied.
+    # Gate: the last R CMD check, when its log was supplied. Errors and
+    # warnings block. Notes do not block in general, with one exception: a
+    # note reporting CPU time well above elapsed time means the package used
+    # more than the two cores the CRAN check farm allows, and CRAN's incoming
+    # pretest archives a submission for it. That note is treated as blocking.
     if check_stdout is None:
         gates.append(Gate(
             "R CMD check", None, True,
@@ -174,12 +178,16 @@ def submission_preflight(
         ))
     else:
         summary = parse_check_log(check_stdout)
-        clean = summary.n_errors == 0 and summary.n_warnings == 0
-        gates.append(Gate(
-            "R CMD check", clean, True,
-            f"{summary.n_errors} errors, {summary.n_warnings} warnings, "
-            f"{summary.n_notes} notes",
-        ))
+        multicore = re.search(r"CPU time [0-9.]+ times elapsed",
+                              check_stdout, re.IGNORECASE) is not None
+        clean = (summary.n_errors == 0 and summary.n_warnings == 0
+                 and not multicore)
+        detail = (f"{summary.n_errors} errors, {summary.n_warnings} warnings, "
+                  f"{summary.n_notes} notes")
+        if multicore:
+            detail += ("; a note reports CPU time above elapsed time, the "
+                       "check used more than two cores")
+        gates.append(Gate("R CMD check", clean, True, detail))
 
     # Gate, non-blocking: the built tarball, when supplied.
     tb = Path(tarball) if tarball is not None else None

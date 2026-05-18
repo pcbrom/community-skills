@@ -211,7 +211,7 @@ would be removing a deliberate human checkpoint, not adding a feature.
   "fn": "submission_preflight",
   "package_dir": "string (filesystem path to the package source)",
   "tarball": "string (optional; path to a built source tarball)",
-  "check_stdout": "string (optional; stdout of a prior R CMD check; when given, the error and warning counts become a blocking gate)"
+  "check_stdout": "string (optional; stdout of a prior R CMD check; when given, errors and warnings block, and so does a 'CPU time N times elapsed' note, since CRAN's incoming pretest archives a submission that uses more than two cores)"
 }
 ```
 

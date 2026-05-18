@@ -14,6 +14,11 @@ def _failed_gate_names(result: PreflightResult) -> list[str]:
 
 CLEAN_CHECK = "* using log directory\nStatus: 2 NOTEs\n"
 WARN_CHECK = "* checking foo ... WARNING\ndetail\nStatus: 1 WARNING\n"
+MULTICORE_CHECK = (
+    "* checking tests ... NOTE\n"
+    "  Running R code in 'testthat.R' had CPU time 3.7 times elapsed time\n"
+    "Status: 1 NOTE\n"
+)
 
 DESCRIPTION = """\
 Package: demopkg
@@ -67,6 +72,18 @@ def test_check_warning_blocks(tmp_path):
     result = submission_preflight(pkg, check_stdout=WARN_CHECK)
     assert result.ready is False
     assert "R CMD check" in _failed_gate_names(result)
+
+
+def test_multicore_cpu_time_note_blocks(tmp_path):
+    # A "CPU time N times elapsed" note means the check used more than two
+    # cores; CRAN's incoming pretest archives a submission for it, so the
+    # preflight treats that note as blocking even though it is only a NOTE.
+    pkg = _make_pkg(tmp_path)
+    result = submission_preflight(pkg, check_stdout=MULTICORE_CHECK)
+    assert result.ready is False
+    assert "R CMD check" in _failed_gate_names(result)
+    check_gate = next(g for g in result.gates if g.name == "R CMD check")
+    assert "two cores" in check_gate.detail
 
 
 def test_missing_check_log_is_undetermined_and_blocks(tmp_path):
