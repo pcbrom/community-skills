@@ -141,11 +141,35 @@ def handle_fix_session(payload: dict) -> dict:
     }
 
 
+def handle_submission_preflight(payload: dict) -> dict:
+    from cran_publisher import submission_preflight
+    package_dir = Path(require_field("package_dir", payload,
+                                     "submission_preflight"))
+    result = submission_preflight(
+        package_dir,
+        tarball=payload.get("tarball"),
+        check_stdout=payload.get("check_stdout"),
+    )
+    return {
+        "package": result.package,
+        "version": result.version,
+        "ready": result.ready,
+        "gates": [
+            {"name": g.name, "passed": g.passed, "blocking": g.blocking,
+             "detail": g.detail}
+            for g in result.gates
+        ],
+        "blocking_failures": [g.name for g in result.blocking_failures],
+        "handoff": result.handoff,
+    }
+
+
 HANDLERS = {
     "run_check": handle_run_check,
     "parse_log": handle_parse_log,
     "categorize": handle_categorize,
     "fix_session": handle_fix_session,
+    "submission_preflight": handle_submission_preflight,
 }
 
 

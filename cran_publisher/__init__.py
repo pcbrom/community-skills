@@ -62,6 +62,11 @@ from .fix_loop import (
     fix_session,
     run_full_session,
 )
+from .preflight import (
+    Gate,
+    PreflightResult,
+    submission_preflight,
+)
 from .report import ReportInputs, render_report
 
 __version__ = "0.1.0"
@@ -82,6 +87,8 @@ __all__ = [
     "FixAttempt",
     "FixProposal",
     "FixSession",
+    "Gate",
+    "PreflightResult",
     "ReportInputs",
     "VERDICT_ERROR",
     "VERDICT_NOTE",
@@ -102,4 +109,5 @@ __all__ = [
     "render_report",
     "run_check",
     "run_full_session",
+    "submission_preflight",
 ]

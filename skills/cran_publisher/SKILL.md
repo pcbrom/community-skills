@@ -189,6 +189,59 @@ for the full compilation.
 }
 ```
 
+### `submission_preflight`: the submission readiness gate
+
+`R CMD check` answers "does the package check clean". It does not answer
+"is this release ready to submit". This function makes the policy checks
+the check omits and returns one structured verdict: required `DESCRIPTION`
+fields, a release version that is not a development version, a `NEWS`
+entry for the version, a populated `cran-comments.md`, the `LICENSE` file,
+the last check result, and the built tarball.
+
+It deliberately stops at the verdict. It does not upload anything. The
+submission itself, and the confirmation e-mail CRAN sends to the
+maintainer, stay with the maintainer by design: that e-mail is the
+accountability gate for publishing under a person's name, and removing it
+would be removing a deliberate human checkpoint, not adding a feature.
+
+**Input**
+
+```json
+{
+  "fn": "submission_preflight",
+  "package_dir": "string (filesystem path to the package source)",
+  "tarball": "string (optional; path to a built source tarball)",
+  "check_stdout": "string (optional; stdout of a prior R CMD check; when given, the error and warning counts become a blocking gate)"
+}
+```
+
+**Output**
+
+```json
+{
+  "ok": true,
+  "fn": "submission_preflight",
+  "result": {
+    "package": "string",
+    "version": "string",
+    "ready": "boolean (true only when every blocking gate passes)",
+    "gates": [
+      {
+        "name": "string",
+        "passed": "boolean or null (null means undetermined)",
+        "blocking": "boolean",
+        "detail": "string"
+      }
+    ],
+    "blocking_failures": "array of strings (names of the blocking gates that failed)",
+    "handoff": "array of strings (the remaining manual steps when ready)"
+  }
+}
+```
+
+Pass `check_stdout` from a clean-environment check, such as win-builder,
+rather than a local check whose warnings may be environment artifacts.
+
 ## When to invoke
 
 - The agent has a CRAN package source tree on disk and wants the
@@ -201,6 +254,9 @@ for the full compilation.
 - The agent is supervising a CRAN release cycle and wants to attempt
   automated fixes for the easy classes of issue while keeping a clear
   audit trail and a human gate before submission.
+- The agent has a package that checks clean and wants the structured
+  "is this release ready to submit" verdict before handing off to the
+  maintainer for the submission itself.
 
 ## Error contract
 
