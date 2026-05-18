@@ -67,6 +67,10 @@ from .preflight import (
     PreflightResult,
     submission_preflight,
 )
+from .submit import (
+    SubmitResult,
+    submit_to_cran,
+)
 from .report import ReportInputs, render_report
 
 __version__ = "0.1.0"
@@ -90,6 +94,7 @@ __all__ = [
     "Gate",
     "PreflightResult",
     "ReportInputs",
+    "SubmitResult",
     "VERDICT_ERROR",
     "VERDICT_NOTE",
     "VERDICT_OK",
@@ -110,4 +115,5 @@ __all__ = [
     "run_check",
     "run_full_session",
     "submission_preflight",
+    "submit_to_cran",
 ]

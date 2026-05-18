@@ -164,12 +164,36 @@ def handle_submission_preflight(payload: dict) -> dict:
     }
 
 
+def handle_submit(payload: dict) -> dict:
+    from cran_publisher import submit_to_cran
+    package_dir = Path(require_field("package_dir", payload, "submit"))
+    result = submit_to_cran(
+        package_dir,
+        confirm=payload.get("confirm") is True,
+        check_stdout=payload.get("check_stdout"),
+        tarball=payload.get("tarball"),
+        timeout=float(payload.get("timeout") or 1800),
+    )
+    return {
+        "package": result.package,
+        "version": result.version,
+        "uploaded": result.uploaded,
+        "dry_run": result.dry_run,
+        "preflight_ready": result.preflight_ready,
+        "reason": result.reason,
+        "rscript_exit_code": result.rscript_exit_code,
+        "output": _truncate(result.output, STDOUT_TRUNCATE),
+        "next_step": result.next_step,
+    }
+
+
 HANDLERS = {
     "run_check": handle_run_check,
     "parse_log": handle_parse_log,
     "categorize": handle_categorize,
     "fix_session": handle_fix_session,
     "submission_preflight": handle_submission_preflight,
+    "submit": handle_submit,
 }
 
 

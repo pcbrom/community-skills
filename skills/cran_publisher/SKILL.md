@@ -242,6 +242,55 @@ would be removing a deliberate human checkpoint, not adding a feature.
 Pass `check_stdout` from a clean-environment check, such as win-builder,
 rather than a local check whose warnings may be environment artifacts.
 
+### `submit`: the gated CRAN upload
+
+Uploads the package to CRAN through `devtools::submit_cran()`, behind two
+gates: the `submission_preflight` must pass, and the caller must pass
+`confirm=true`. With `confirm` unset the call is a dry run that reports the
+preflight and the command it would run, and uploads nothing.
+
+It stops at the upload. The confirmation e-mail CRAN sends to the
+maintainer is never touched: clicking that link is the maintainer's act,
+the accountability gate for publishing under a person's name. A skill that
+clicked it would be removing a deliberate human checkpoint.
+
+**Input**
+
+```json
+{
+  "fn": "submit",
+  "package_dir": "string (filesystem path to the package source)",
+  "confirm": "boolean (the upload runs only when this is exactly true; otherwise the call is a dry run)",
+  "check_stdout": "string (optional; stdout of a prior R CMD check, passed to the preflight)",
+  "tarball": "string (optional; path to a built source tarball)",
+  "timeout": "number (optional; wall-clock seconds for devtools::submit_cran(), which rebuilds the package; default 1800)"
+}
+```
+
+**Output**
+
+```json
+{
+  "ok": true,
+  "fn": "submit",
+  "result": {
+    "package": "string",
+    "version": "string",
+    "uploaded": "boolean (true only when the upload ran and returned success)",
+    "dry_run": "boolean (true when confirm was not set)",
+    "preflight_ready": "boolean",
+    "reason": "string",
+    "rscript_exit_code": "integer or null",
+    "output": "string (devtools::submit_cran() output, truncated)",
+    "next_step": "string"
+  }
+}
+```
+
+After a real upload the submission is still not complete: CRAN e-mails the
+maintainer a confirmation link, and clicking it is the maintainer's step,
+not the skill's.
+
 ## When to invoke
 
 - The agent has a CRAN package source tree on disk and wants the
@@ -257,6 +306,9 @@ rather than a local check whose warnings may be environment artifacts.
 - The agent has a package that checks clean and wants the structured
   "is this release ready to submit" verdict before handing off to the
   maintainer for the submission itself.
+- The maintainer has decided to submit and wants the upload run behind
+  the preflight and confirm gates, stopping at the CRAN confirmation
+  e-mail, which stays the maintainer's to click.
 
 ## Error contract
 
