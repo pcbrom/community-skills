@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml)
-[![Skills: 94](https://img.shields.io/badge/skills-94-blue.svg)](skills/)
+[![Skills: 95](https://img.shields.io/badge/skills-95-blue.svg)](skills/)
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](https://zenodo.org/)
 
 ## What this repository is
@@ -107,7 +107,7 @@ community-skills/
 │   ├── cran_publisher/          <- Python skill: run_check / parse_log / categorize / fix_session
 │   ├── cran_workflow/           <- Python skill: composition of cran_graph + cran_publisher
 │   ├── autoresearch/            <- Python skill: autonomous optimization loop (Phase 6 anchor)
-│   ├── glue/, jsonlite/, ...    <- 88 R skills promoted from staging
+│   ├── glue/, jsonlite/, ...    <- 90 R skills promoted from staging
 │   └── _staging/                <- LLM-generated drafts awaiting human review (gitignored)
 ├── templates/
 │   └── new_r_skill/             <- copy-paste scaffold for a new R skill
@@ -201,7 +201,7 @@ Each draft lands in `skills/_staging/<package>/SKILL.md` with a sibling `_meta.j
 
 ## Available skills
 
-The gallery has 94 skills as of 2026-05-11.
+The gallery has 95 skills as of 2026-05-11.
 
 ### Core skills (curated, all-in)
 
@@ -215,7 +215,7 @@ The gallery has 94 skills as of 2026-05-11.
 
 ### CRAN top-100 (LLM-drafted, staging-then-promoted)
 
-89 R skills drafted with Gemma 4 26b-fast from the cranlogs top-100 of the last month and promoted after structural smoke validation. Examples: `dplyr`, `ggplot2`, `rlang`, `tibble`, `vctrs`, `purrr`, `stringr`, `cli`, `glue`, `Rcpp`. The full list and the audit results live at [`skills/README.md`](skills/README.md).
+90 R skills drafted with Gemma 4 26b-fast from the cranlogs top-100 of the last month and promoted after structural smoke validation. Examples: `dplyr`, `ggplot2`, `rlang`, `tibble`, `vctrs`, `purrr`, `stringr`, `cli`, `glue`, `Rcpp`. The full list and the audit results live at [`skills/README.md`](skills/README.md).
 
 One CRAN top-100 package (`rmarkdown`) carries 94 exports and exceeds the auto-generator's reliable window; the draft remains in `skills/_staging/rmarkdown/` pending a hand-written dispatcher with a smaller exposed surface.
 
