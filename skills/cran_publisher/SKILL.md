@@ -39,7 +39,15 @@ fast-forwarding the result onto a publishable branch.
 
 The dispatcher selects on the `fn` field of the JSON payload.
 
-### `run_check`: run `R CMD check` against a package source tree
+### `run_check`: build the package, then run `R CMD check`
+
+By default the source tree is first turned into a tarball with
+`R CMD build` and the check runs against that tarball, which is what
+CRAN itself does. This is required for any package whose `DESCRIPTION`
+carries only `Authors@R`: the `Author` and `Maintainer` fields are
+derived during the build, so a direct check of the unbuilt directory
+would abort. Set `build_first` to `false` to check the directory in
+place.
 
 **Input**
 
@@ -47,10 +55,18 @@ The dispatcher selects on the `fn` field of the JSON payload.
 {
   "fn": "run_check",
   "package_dir": "string (filesystem path to the package source)",
-  "flags": "array of strings (optional; default: ['--as-cran', '--no-manual', '--no-build-vignettes'])",
-  "timeout": "number (optional; wall-clock seconds; default: 600)"
+  "flags": "array of strings (optional; R CMD check flags; default: ['--as-cran', '--no-manual', '--no-build-vignettes'])",
+  "timeout": "number (optional; wall-clock seconds for the check; default: 600)",
+  "build_first": "boolean (optional; default true; build a tarball before checking)",
+  "build_flags": "array of strings (optional; R CMD build flags; default: ['--no-build-vignettes', '--no-manual'])",
+  "build_timeout": "number (optional; wall-clock seconds for the build; default: 900)"
 }
 ```
+
+To exercise the vignettes, drop `--no-build-vignettes` from both
+`flags` and `build_flags`. A compiled package, such as one with a Rust
+or C++ component, needs a `timeout` and `build_timeout` large enough
+for the full compilation.
 
 **Output**
 

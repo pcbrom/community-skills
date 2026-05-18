@@ -14,12 +14,15 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
 DEFAULT_TIMEOUT_SECONDS = 600
 DEFAULT_CHECK_FLAGS: tuple[str, ...] = ("--as-cran", "--no-manual", "--no-build-vignettes")
+DEFAULT_BUILD_FLAGS: tuple[str, ...] = ("--no-build-vignettes", "--no-manual")
+DEFAULT_BUILD_TIMEOUT_SECONDS = 900
 
 
 @dataclass(slots=True)
@@ -71,14 +74,39 @@ def _which_r_cmd() -> str | None:
     return shutil.which("R")
 
 
+def _run_build(
+    package_dir: Path,
+    rcmd: str,
+    build_flags: tuple[str, ...],
+    timeout: float,
+    dest_dir: str,
+) -> tuple[int, str, str, Path | None]:
+    """Run ``R CMD build`` for ``package_dir`` into ``dest_dir``.
+
+    Returns the exit code, stdout, stderr and the path of the produced
+    source tarball, or ``None`` when no tarball was written.
+    """
+    args = [rcmd, "CMD", "build", *build_flags, str(package_dir)]
+    completed = subprocess.run(
+        args, capture_output=True, timeout=timeout, check=False, cwd=dest_dir
+    )
+    stdout = completed.stdout.decode("utf-8", errors="replace")
+    stderr = completed.stderr.decode("utf-8", errors="replace")
+    tarballs = sorted(Path(dest_dir).glob("*.tar.gz"))
+    return completed.returncode, stdout, stderr, (tarballs[-1] if tarballs else None)
+
+
 def run_check(
     package_dir: Path | str,
     *,
     flags: tuple[str, ...] = DEFAULT_CHECK_FLAGS,
     timeout: float = DEFAULT_TIMEOUT_SECONDS,
     output_dir: Path | str | None = None,
+    build_first: bool = True,
+    build_flags: tuple[str, ...] = DEFAULT_BUILD_FLAGS,
+    build_timeout: float = DEFAULT_BUILD_TIMEOUT_SECONDS,
 ) -> CheckResult:
-    """Run ``R CMD check <flags> <package_dir>`` and capture the output.
+    """Build the package, then run ``R CMD check`` and capture the output.
 
     Parameters
     ----------
@@ -90,12 +118,24 @@ def run_check(
         `R CMD check --as-cran` runs in CI: full CRAN gate with manual and
         vignette builds disabled to keep wall-clock predictable.
     timeout
-        Wall-clock seconds before the subprocess is killed. Failure mode
-        ``timed_out=True``.
+        Wall-clock seconds before the check subprocess is killed. Failure
+        mode ``timed_out=True``.
     output_dir
         If provided, ``R CMD check`` is told to write its check directory
         there via ``-o <output_dir>``. Otherwise the check directory lands
         in the current working directory as ``<pkg>.Rcheck/``.
+    build_first
+        When ``True`` (the default, and what CRAN itself does), the source
+        tree is first turned into a tarball with ``R CMD build`` and the
+        check runs against that tarball. This is required for any package
+        whose ``DESCRIPTION`` carries only ``Authors@R``: the ``Author``
+        and ``Maintainer`` fields are derived during the build, and a
+        direct ``R CMD check`` of the unbuilt directory would abort. When
+        ``False``, the directory is checked in place.
+    build_flags
+        Extra arguments passed to ``R CMD build``.
+    build_timeout
+        Wall-clock seconds before the build subprocess is killed.
     """
     package_dir = Path(package_dir)
     if not (package_dir / "DESCRIPTION").is_file():
@@ -107,29 +147,61 @@ def run_check(
     if rcmd is None:
         raise FileNotFoundError("R not found on PATH; install R to use cran_publisher.check")
 
-    args = [rcmd, "CMD", "check", *flags]
-    if output_dir is not None:
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
-        args.extend(["-o", str(output_dir)])
-    args.append(str(package_dir))
-
     started = time.time()
-    timed_out = False
-    try:
-        completed = subprocess.run(
-            args,
-            capture_output=True,
-            timeout=timeout,
-            check=False,
-        )
-        stdout = completed.stdout.decode("utf-8", errors="replace")
-        stderr = completed.stderr.decode("utf-8", errors="replace")
-        exit_code = completed.returncode
-    except subprocess.TimeoutExpired as exc:
-        timed_out = True
-        stdout = (exc.stdout or b"").decode("utf-8", errors="replace")
-        stderr = (exc.stderr or b"").decode("utf-8", errors="replace")
-        exit_code = -1
+    with tempfile.TemporaryDirectory(prefix="cran_publisher_build_") as tmp:
+        if build_first:
+            try:
+                rc, b_out, b_err, tarball = _run_build(
+                    package_dir, rcmd, tuple(build_flags), build_timeout, tmp
+                )
+            except subprocess.TimeoutExpired as exc:
+                return CheckResult(
+                    package_dir=package_dir,
+                    exit_code=-1,
+                    stdout=(exc.stdout or b"").decode("utf-8", errors="replace"),
+                    stderr="R CMD build timed out before the check could run",
+                    wall_clock_s=time.time() - started,
+                    timed_out=True,
+                    flags=tuple(flags),
+                    rcmd_path=rcmd,
+                )
+            if rc != 0 or tarball is None:
+                return CheckResult(
+                    package_dir=package_dir,
+                    exit_code=rc or 1,
+                    stdout=b_out + "\n" + b_err,
+                    stderr="R CMD build failed; the check was not run",
+                    wall_clock_s=time.time() - started,
+                    timed_out=False,
+                    flags=tuple(flags),
+                    rcmd_path=rcmd,
+                )
+            target = str(tarball)
+        else:
+            target = str(package_dir)
+
+        args = [rcmd, "CMD", "check", *flags]
+        if output_dir is not None:
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            args.extend(["-o", str(output_dir)])
+        args.append(target)
+
+        timed_out = False
+        try:
+            completed = subprocess.run(
+                args,
+                capture_output=True,
+                timeout=timeout,
+                check=False,
+            )
+            stdout = completed.stdout.decode("utf-8", errors="replace")
+            stderr = completed.stderr.decode("utf-8", errors="replace")
+            exit_code = completed.returncode
+        except subprocess.TimeoutExpired as exc:
+            timed_out = True
+            stdout = (exc.stdout or b"").decode("utf-8", errors="replace")
+            stderr = (exc.stderr or b"").decode("utf-8", errors="replace")
+            exit_code = -1
 
     wall = time.time() - started
     return CheckResult(
@@ -146,7 +218,9 @@ def run_check(
 
 __all__ = [
     "DEFAULT_CHECK_FLAGS",
+    "DEFAULT_BUILD_FLAGS",
     "DEFAULT_TIMEOUT_SECONDS",
+    "DEFAULT_BUILD_TIMEOUT_SECONDS",
     "CheckResult",
     "run_check",
 ]

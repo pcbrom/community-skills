@@ -55,7 +55,14 @@ def handle_run_check(payload: dict) -> dict:
     flags = tuple(payload.get("flags") or
                   ("--as-cran", "--no-manual", "--no-build-vignettes"))
     timeout = float(payload.get("timeout") or 600)
-    result = run_check(package_dir, flags=flags, timeout=timeout)
+    build_first = payload.get("build_first", True)
+    kwargs: dict = {"flags": flags, "timeout": timeout,
+                    "build_first": bool(build_first)}
+    if payload.get("build_flags"):
+        kwargs["build_flags"] = tuple(payload["build_flags"])
+    if payload.get("build_timeout"):
+        kwargs["build_timeout"] = float(payload["build_timeout"])
+    result = run_check(package_dir, **kwargs)
     return {
         "exit_code": result.exit_code,
         "wall_clock_s": result.wall_clock_s,
