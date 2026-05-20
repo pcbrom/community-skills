@@ -2,7 +2,7 @@
 name: autoresearch
 runtime: python
 package: autoresearch
-package_source: PyPI / source (Trabalho do Dr. Brom)
+package_source: PyPI / source
 package_url: https://github.com/pcbrom/autoresearch
 package_version_pinned: ">=0.1.0"
 license: MIT
@@ -11,7 +11,7 @@ maintainer: "Pedro Carvalho Brom <pcbrom@gmail.com>"
 
 # Skill: autoresearch
 
-Wraps the autoresearch package (DOI [10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195), Trabalho do Dr. Brom) as an LLM-callable skill. autoresearch generalizes Karpathy's autonomous-optimization loop as a Python library: a runner that mutates a single file, executes an experiment, extracts a metric, and either advances or resets the git head, plus a JSON-schema-constrained LLM critic that proposes the next change. The skill exposes the six single-shot CLI subcommands; the long-running `loop` and the interactive `wizard` are out of scope because they violate the JSON-in / JSON-out contract.
+Wraps the autoresearch package (DOI [10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195)) as an LLM-callable skill. autoresearch generalizes Karpathy's autonomous-optimization loop as a Python library: a runner that mutates a single file, executes an experiment, extracts a metric, and either advances or resets the git head, plus a JSON-schema-constrained LLM critic that proposes the next change. The skill exposes the six single-shot CLI subcommands; the long-running `loop` and the interactive `wizard` are out of scope because they violate the JSON-in / JSON-out contract.
 
 This skill is the instrumental anchor of Phase 6 of the cran-graph sprint: the same `propose-validate-iterate` loop becomes the motor of `forks/glmnet-fast/` and `forks/survival-fast/` optimization with the equivalence harness gating each iteration.
 

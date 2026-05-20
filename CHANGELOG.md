@@ -50,7 +50,7 @@ Each release receives a Zenodo DOI. The DOI is added to the entry below once the
 - `bridges/python.py`: default subprocess timeout raised from 60 s to 900 s. Python-runtime skills can shell out to `R CMD check` or Ollama, both multi-minute on a real package. Per-invocation `timeout` override remains available.
 
 ### Added: autoresearch skill (2026-05-09)
-- `skills/autoresearch/`: third Python skill on the hub. Wraps the `autoresearch` package (Trabalho do Dr. Brom, [DOI 10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195)) and exposes six single-shot CLI subcommands (`init`, `run`, `critic`, `analyze`, `audit`, `state`). The long-running `loop` and the interactive `wizard` are intentionally out of scope of the skill contract.
+- `skills/autoresearch/`: third Python skill on the hub. Wraps the `autoresearch` package ([DOI 10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195)) and exposes six single-shot CLI subcommands (`init`, `run`, `critic`, `analyze`, `audit`, `state`). The long-running `loop` and the interactive `wizard` are intentionally out of scope of the skill contract.
 - The dispatcher shells out to the `autoresearch` CLI so the skill stays decoupled from upstream API refactors. 5 smoke tests cover missing/unknown `fn`, required-field surfacing for `init`, and a `critic --dry-run` round-trip that returns a structured subprocess outcome without touching Ollama.
 - Strategic role: this skill is the instrumental anchor of Phase 6 of the sprint. The same propose-validate-iterate loop becomes the motor of `forks/glmnet-fast/` and `forks/survival-fast/` optimization once the equivalence harness lands.
 
