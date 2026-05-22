@@ -187,6 +187,79 @@ def handle_submit(payload: dict) -> dict:
     }
 
 
+def handle_runiverse_preflight(payload: dict) -> dict:
+    from cran_publisher import runiverse_preflight
+    package_dir = Path(require_field("package_dir", payload,
+                                     "runiverse_preflight"))
+    result = runiverse_preflight(
+        package_dir,
+        check_stdout=payload.get("check_stdout"),
+    )
+    return {
+        "package": result.package,
+        "version": result.version,
+        "ready": result.ready,
+        "gates": [
+            {"name": g.name, "passed": g.passed, "blocking": g.blocking,
+             "detail": g.detail}
+            for g in result.gates
+        ],
+        "blocking_failures": [g.name for g in result.blocking_failures],
+        "handoff": result.handoff,
+    }
+
+
+def handle_runiverse_register(payload: dict) -> dict:
+    from cran_publisher import runiverse_register
+    universe_dir = Path(require_field("universe_dir", payload,
+                                      "runiverse_register"))
+    package = require_field("package", payload, "runiverse_register")
+    url = require_field("url", payload, "runiverse_register")
+    result = runiverse_register(
+        universe_dir,
+        package=package,
+        url=url,
+        branch=payload.get("branch"),
+        subdir=payload.get("subdir"),
+        confirm=payload.get("confirm") is True,
+    )
+    return {
+        "universe_dir": result.universe_dir,
+        "package": result.package,
+        "action": result.action,
+        "written": result.written,
+        "dry_run": result.dry_run,
+        "entry": result.entry,
+        "entries": result.entries,
+        "next_step": result.next_step,
+    }
+
+
+def handle_runiverse_status(payload: dict) -> dict:
+    from cran_publisher import runiverse_status
+    universe = require_field("universe", payload, "runiverse_status")
+    result = runiverse_status(
+        universe,
+        payload.get("package"),
+        timeout=float(payload.get("timeout") or 30),
+    )
+    return {
+        "universe": result.universe,
+        "package": result.package,
+        "found": result.found,
+        "reason": result.reason,
+        "status": result.status,
+        "version": result.version,
+        "build_url": result.build_url,
+        "remote_url": result.remote_url,
+        "remote_sha": result.remote_sha,
+        "published": result.published,
+        "binaries": result.binaries,
+        "jobs": result.jobs,
+        "packages": result.packages,
+    }
+
+
 HANDLERS = {
     "run_check": handle_run_check,
     "parse_log": handle_parse_log,
@@ -194,6 +267,9 @@ HANDLERS = {
     "fix_session": handle_fix_session,
     "submission_preflight": handle_submission_preflight,
     "submit": handle_submit,
+    "runiverse_preflight": handle_runiverse_preflight,
+    "runiverse_register": handle_runiverse_register,
+    "runiverse_status": handle_runiverse_status,
 }
 
 

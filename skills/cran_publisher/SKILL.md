@@ -12,12 +12,26 @@ maintainer: "Pedro Carvalho Brom <pcbrom@gmail.com>"
 # Skill: cran_publisher
 
 Wraps the in-tree `cran_publisher` Python sub-package as an LLM-callable
-skill. The agent invokes one of four contracts: run `R CMD check`
-against an unpacked R package source tree; parse a check log into
-structured issues; categorize the issues into a short living taxonomy;
-or run a full automated fix loop that proposes minimal patches via a
-local LLM, validates them through a fresh `R CMD check`, and merges
-each accepted patch into a session branch via `git merge --no-ff`.
+skill. The skill covers the two distribution channels of the R
+ecosystem: CRAN and r-universe.
+
+For CRAN the agent can run `R CMD check` against an unpacked R package
+source tree; parse a check log into structured issues; categorize the
+issues into a short living taxonomy; run a full automated fix loop that
+proposes minimal patches via a local LLM, validates them through a
+fresh `R CMD check`, and merges each accepted patch into a session
+branch via `git merge --no-ff`; run a submission readiness preflight;
+and run the gated upload through `devtools::submit_cran()`.
+
+For r-universe the agent can run a lighter readiness preflight, register
+a package in the `packages.json` of a `<user>.r-universe.dev` universe,
+and read the r-universe API for the build and per-platform check state
+of a package already in a universe. r-universe is the channel for a
+package CRAN cannot take: CRAN rejects a source tarball above 10 MB, and
+a package whose build vendors a large dependency tree, such as an R
+package with a Rust component, can cross that limit for reasons that are
+arithmetic, not quality. r-universe builds from a Git repository with no
+tarball size limit and no incoming pretest.
 
 The fix loop is intended to be run by a human-supervised agent against
 its own CRAN package. The merge always happens on a session branch;
@@ -291,6 +305,142 @@ After a real upload the submission is still not complete: CRAN e-mails the
 maintainer a confirmation link, and clicking it is the maintainer's step,
 not the skill's.
 
+### `runiverse_preflight`: the r-universe readiness gate
+
+The r-universe counterpart of `submission_preflight`. It is lighter than
+the CRAN preflight because r-universe drops the rules CRAN enforces: it
+accepts a development version, needs no `cran-comments.md`, does not
+archive a package for using more than two cores, and has no tarball size
+limit. It keeps the rules r-universe still needs: a valid `DESCRIPTION`,
+a well-formed version, and a Git origin remote for the universe to pull
+from. When a check log is supplied, errors block; warnings and notes are
+reported but do not block, because r-universe publishes a package with
+check warnings and only renders the badge.
+
+**Input**
+
+```json
+{
+  "fn": "runiverse_preflight",
+  "package_dir": "string (filesystem path to the package source)",
+  "check_stdout": "string (optional; stdout of a prior R CMD check; when given, errors block, warnings and notes do not)"
+}
+```
+
+**Output**
+
+```json
+{
+  "ok": true,
+  "fn": "runiverse_preflight",
+  "result": {
+    "package": "string",
+    "version": "string",
+    "ready": "boolean (true only when every blocking gate passes)",
+    "gates": [
+      {
+        "name": "string",
+        "passed": "boolean or null (null means undetermined)",
+        "blocking": "boolean",
+        "detail": "string"
+      }
+    ],
+    "blocking_failures": "array of strings (names of the blocking gates that failed)",
+    "handoff": "array of strings (the remaining steps when ready)"
+  }
+}
+```
+
+### `runiverse_register`: register a package in a universe
+
+Adds or updates a package entry in the `packages.json` of a universe, a
+`<user>.r-universe.dev` Git repository whose root `packages.json` lists
+the packages the universe builds. The merge is idempotent: an existing
+entry for the same package name is replaced, otherwise the entry is
+appended. With `confirm` unset the call is a dry run that reports the
+merge it would make and writes nothing.
+
+It stops at writing the file. Committing and pushing the universe
+repository is the maintainer's act, the point at which a package starts
+being published under a person's universe.
+
+**Input**
+
+```json
+{
+  "fn": "runiverse_register",
+  "universe_dir": "string (path to a local clone of the <user>.r-universe.dev repository)",
+  "package": "string (the package name, the Package field of its DESCRIPTION)",
+  "url": "string (the Git URL r-universe pulls the package from)",
+  "branch": "string (optional; branch name; omitted entries track the repository default)",
+  "subdir": "string (optional; subdirectory for a package not at the repository root)",
+  "confirm": "boolean (the file is written only when this is exactly true; otherwise the call is a dry run)"
+}
+```
+
+**Output**
+
+```json
+{
+  "ok": true,
+  "fn": "runiverse_register",
+  "result": {
+    "universe_dir": "string",
+    "package": "string",
+    "action": "added | updated | unchanged",
+    "written": "boolean (true only when the file was written)",
+    "dry_run": "boolean (true when confirm was not set)",
+    "entry": "object (the merged package entry)",
+    "entries": "array of objects (the resulting packages.json content)",
+    "next_step": "string"
+  }
+}
+```
+
+### `runiverse_status`: read the r-universe build state
+
+Reads the r-universe JSON API for a universe. With `package` given it
+reports that single package: the build status, the version, the
+build-log URL, the binaries, and the per-platform check verdicts. With
+`package` omitted it lists every package in the universe with its
+version and status. The `universe` argument accepts a bare name
+(`pcbrom`), a host (`pcbrom.r-universe.dev`), or a URL.
+
+**Input**
+
+```json
+{
+  "fn": "runiverse_status",
+  "universe": "string (the universe; a bare name, a host, or a URL)",
+  "package": "string (optional; a single package to report; omitted lists the whole universe)",
+  "timeout": "number (optional; wall-clock seconds for the HTTP request; default 30)"
+}
+```
+
+**Output**
+
+```json
+{
+  "ok": true,
+  "fn": "runiverse_status",
+  "result": {
+    "universe": "string",
+    "package": "string or null",
+    "found": "boolean",
+    "reason": "string",
+    "status": "string or null (the _status field: success or failure)",
+    "version": "string or null",
+    "build_url": "string or null (the build-log URL)",
+    "remote_url": "string or null",
+    "remote_sha": "string or null",
+    "published": "string or null (publication timestamp)",
+    "binaries": "array of objects (built binaries, per OS and R version)",
+    "jobs": "array of objects ({config, check}: the per-platform check verdict)",
+    "packages": "array of objects ({package, version, status}; populated only when package was omitted)"
+  }
+}
+```
+
 ## When to invoke
 
 - The agent has a CRAN package source tree on disk and wants the
@@ -309,6 +459,13 @@ not the skill's.
 - The maintainer has decided to submit and wants the upload run behind
   the preflight and confirm gates, stopping at the CRAN confirmation
   e-mail, which stays the maintainer's to click.
+- The package cannot go to CRAN, because its source tarball crosses the
+  10 MB limit or for any other reason, and the agent wants the
+  r-universe readiness verdict before registering it in a universe.
+- The agent maintains a `<user>.r-universe.dev` universe and wants a
+  package added to or updated in its `packages.json`.
+- The agent wants the current build status, version, or per-platform
+  check verdicts of a package already served by a universe.
 
 ## Error contract
 
@@ -318,12 +475,19 @@ Any failure inside the dispatcher returns:
 { "ok": false, "fn": "<requested>", "error": "<human-readable message>" }
 ```
 
-Examples: missing required field (`package_dir` for `run_check`),
-package directory has no `DESCRIPTION`, R is not installed, Ollama
-unreachable, the run repository has uncommitted changes, the proposal
-contained an out-of-tree path. The fix-loop function always commits
-its accepted patches; failed attempts are reverted via
-`git reset --hard` so the run branch only carries clean history.
+Examples: missing required field (`package_dir` for `run_check`,
+`universe_dir` for `runiverse_register`), package directory has no
+`DESCRIPTION`, R is not installed, Ollama unreachable, the run
+repository has uncommitted changes, the proposal contained an
+out-of-tree path, the universe directory does not exist, the r-universe
+API could not be reached. The fix-loop function always commits its
+accepted patches; failed attempts are reverted via `git reset --hard`
+so the run branch only carries clean history.
+
+`runiverse_status` does not raise on a missing universe or package: it
+returns `found: false` with a `reason`, since "the package is not in the
+universe yet" is a normal state during a registration cycle, not an
+error.
 
 ## Worked examples
 

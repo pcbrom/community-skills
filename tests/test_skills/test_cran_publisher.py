@@ -1,11 +1,13 @@
 """Smoke tests for the cran_publisher skill (Python runtime).
 
 Exercises the dispatcher through ``bridges.invoke`` to confirm the
-JSON-in / JSON-out contract holds end-to-end for all six functions.
+JSON-in / JSON-out contract holds end-to-end for all nine functions, the
+six CRAN-channel ones and the three r-universe-channel ones.
 Heavy-weight handlers (`run_check`, `fix_session`) and the policy
-internals of `submission_preflight` / `submit` are exercised by the
-package-level tests in ``tests/test_cran_publisher.py`` and
-``tests/test_cran_publisher_preflight.py``; here we cover only the
+internals of `submission_preflight`, `submit`, and the r-universe
+functions are exercised by the package-level tests in
+``tests/test_cran_publisher.py``, ``tests/test_cran_publisher_preflight.py``
+and ``tests/test_cran_publisher_runiverse.py``; here we cover only the
 skill contract.
 """
 from __future__ import annotations
@@ -150,3 +152,62 @@ def test_submit_blocked_by_failing_preflight(tmp_path):
     assert payload["uploaded"] is False
     assert payload["preflight_ready"] is False
     assert "preflight" in payload["reason"].lower()
+
+
+# --------------------------------------------------------------------------- #
+# r-universe channel: skill-level contract for the three runiverse_* functions
+# --------------------------------------------------------------------------- #
+
+
+def test_runiverse_preflight_requires_package_dir():
+    result = invoke("cran_publisher", {"fn": "runiverse_preflight"})
+    assert result["ok"] is False
+    assert "package_dir" in result["error"]
+
+
+def test_runiverse_register_requires_universe_dir():
+    result = invoke("cran_publisher", {"fn": "runiverse_register"})
+    assert result["ok"] is False
+    assert "universe_dir" in result["error"]
+
+
+def test_runiverse_status_requires_universe():
+    result = invoke("cran_publisher", {"fn": "runiverse_status"})
+    assert result["ok"] is False
+    assert "universe" in result["error"]
+
+
+def test_runiverse_preflight_returns_structured_verdict(tmp_path):
+    """The r-universe preflight returns a structured verdict without
+    raising. A minimal package has no Git origin remote, so the verdict
+    is not ready, and the failing gate is named."""
+    pkg = _minimal_pkg(tmp_path)
+    result = invoke("cran_publisher", {
+        "fn": "runiverse_preflight",
+        "package_dir": str(pkg),
+    })
+    assert result["ok"] is True
+    payload = result["result"]
+    assert payload["package"] == "fakepkg"
+    assert payload["version"] == "0.1.0"
+    assert payload["ready"] is False
+    assert "git origin remote" in payload["blocking_failures"]
+
+
+def test_runiverse_register_dry_run_contract(tmp_path):
+    """`runiverse_register` without confirm is a dry run: it reports the
+    merge it would make and writes no packages.json."""
+    universe = tmp_path / "pcbrom.r-universe.dev"
+    universe.mkdir()
+    result = invoke("cran_publisher", {
+        "fn": "runiverse_register",
+        "universe_dir": str(universe),
+        "package": "demopkg",
+        "url": "https://github.com/pcbrom/demopkg",
+    })
+    assert result["ok"] is True
+    payload = result["result"]
+    assert payload["dry_run"] is True
+    assert payload["written"] is False
+    assert payload["action"] == "added"
+    assert not (universe / "packages.json").exists()

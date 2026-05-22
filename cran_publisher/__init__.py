@@ -67,6 +67,14 @@ from .preflight import (
     PreflightResult,
     submission_preflight,
 )
+from .runiverse import (
+    RuniversePreflightResult,
+    RuniverseRegisterResult,
+    RuniverseStatusResult,
+    runiverse_preflight,
+    runiverse_register,
+    runiverse_status,
+)
 from .submit import (
     SubmitResult,
     submit_to_cran,
@@ -94,6 +102,9 @@ __all__ = [
     "Gate",
     "PreflightResult",
     "ReportInputs",
+    "RuniversePreflightResult",
+    "RuniverseRegisterResult",
+    "RuniverseStatusResult",
     "SubmitResult",
     "VERDICT_ERROR",
     "VERDICT_NOTE",
@@ -114,6 +125,9 @@ __all__ = [
     "render_report",
     "run_check",
     "run_full_session",
+    "runiverse_preflight",
+    "runiverse_register",
+    "runiverse_status",
     "submission_preflight",
     "submit_to_cran",
 ]

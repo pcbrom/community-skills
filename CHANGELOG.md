@@ -6,6 +6,12 @@ Each release receives a Zenodo DOI. The DOI is added to the entry below once the
 
 ## [Unreleased]
 
+### Added: cran_publisher r-universe channel (2026-05-22)
+- `cran_publisher` gained a second distribution channel. CRAN rejects a source tarball above 10 MB, and a package whose build vendors a large dependency tree, such as an R package with a Rust component, can cross that limit for reasons that are arithmetic, not quality. This was reached in practice by the sibling package `gpumetropolis`, whose vendored GPU dependency tree took the tarball to 44.85 MB; the maintainer moved its distribution to r-universe. The skill now serves both channels.
+- `cran_publisher/runiverse.py`: three functions. `runiverse_preflight` is the r-universe readiness gate, lighter than the CRAN preflight because r-universe accepts a development version, needs no `cran-comments.md`, does not archive a package for using more than two cores, and has no tarball size limit; it keeps the rules r-universe still needs, a valid `DESCRIPTION`, a well-formed version, and a Git origin remote. `runiverse_register` adds or updates a package entry in the `packages.json` of a `<user>.r-universe.dev` universe, idempotently, behind a `confirm` gate, stopping short of the commit and push. `runiverse_status` reads the r-universe JSON API for the build status, version, build-log URL, binaries, and per-platform check verdicts of a package in a universe.
+- `skills/cran_publisher/`: dispatcher and `SKILL.md` extended with `runiverse_preflight`, `runiverse_register`, and `runiverse_status`. The skill now exposes nine functions, six for CRAN and three for r-universe.
+- Tests: `tests/test_cran_publisher_runiverse.py` (17 package-level tests covering the three functions, with the r-universe API stubbed for offline determinism) and five skill-level contract tests added to `tests/test_skills/test_cran_publisher.py`.
+
 ### Public artefacts aligned with v0.2.0 (2026-05-11)
 - `pyproject.toml` version bumped to 0.2.0; package description rewritten for the R-only scope; keywords updated (added `cran`, `r-packages`, `dependency-graph`, `r-cmd-check`; removed `package-wrapping` as generic).
 - `CITATION.cff` and `.zenodo.json` rewritten to describe the v0.2.0 deliverables (`cran_graph`, `cran_publisher`, `cran_workflow`, `autoresearch`, plus 89 LLM-drafted R skills) and to drop the legacy multi-language framing.

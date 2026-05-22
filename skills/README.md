@@ -25,7 +25,7 @@ Gallery size as of 2026-05-11: **95 skills**.
 |---|---|---|---|
 | [bgumbel](bgumbel/) | R | canonical R reference; 7 functions over the bimodal Gumbel distribution. Wraps [pcbrom/bgumbel](https://github.com/pcbrom/bgumbel) (CRAN, ~48K downloads, 10 citing papers) | v0.1.0 |
 | [cran_graph](cran_graph/) | Python | `build_snapshot`, `stats`, `optimize`, `plot_closure` over the in-tree `cran_graph` sub-package | v0.2.0 |
-| [cran_publisher](cran_publisher/) | Python | `run_check`, `parse_log`, `categorize`, `fix_session` over the in-tree `cran_publisher` sub-package | v0.2.0 |
+| [cran_publisher](cran_publisher/) | Python | CRAN channel (`run_check`, `parse_log`, `categorize`, `fix_session`, `submission_preflight`, `submit`) and r-universe channel (`runiverse_preflight`, `runiverse_register`, `runiverse_status`) over the in-tree `cran_publisher` sub-package | v0.2.0 |
 | [cran_workflow](cran_workflow/) | Python | `audit_release`, `fix_and_report`; composes `cran_graph` and `cran_publisher` | v0.2.0 |
 | [autoresearch](autoresearch/) | Python | `init`, `run`, `critic`, `analyze`, `audit`, `state` over [pcbrom/autoresearch](https://github.com/pcbrom/autoresearch) ([DOI 10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195)); Phase 6 instrumental anchor | v0.2.0 |
 

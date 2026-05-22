@@ -104,7 +104,7 @@ community-skills/
 │   ├── README.md                <- gallery index + per-skill hierarchy
 │   ├── bgumbel/                 <- canonical R skill (worked example)
 │   ├── cran_graph/              <- Python skill: graph build / stats / optimize / plot
-│   ├── cran_publisher/          <- Python skill: run_check / parse_log / categorize / fix_session
+│   ├── cran_publisher/          <- Python skill: CRAN check / fix loop / submit, plus r-universe register / status
 │   ├── cran_workflow/           <- Python skill: composition of cran_graph + cran_publisher
 │   ├── autoresearch/            <- Python skill: autonomous optimization loop (Phase 6 anchor)
 │   ├── glue/, jsonlite/, ...    <- 90 R skills promoted from staging
@@ -209,7 +209,7 @@ The gallery has 95 skills as of 2026-05-11.
 |---|---|---|---|
 | [bgumbel](skills/bgumbel/) | R | canonical R reference; 7 functions over the bimodal Gumbel distribution | v0.1.0 |
 | [cran_graph](skills/cran_graph/) | Python | global CRAN graph and install-set optimizer | v0.2.0 |
-| [cran_publisher](skills/cran_publisher/) | Python | `R CMD check` parser, categorizer and Gemma-driven fix loop | v0.2.0 |
+| [cran_publisher](skills/cran_publisher/) | Python | CRAN channel: `R CMD check` parser, categorizer, Gemma-driven fix loop, submission preflight and gated submit; r-universe channel: readiness preflight, `packages.json` register, build-status query | v0.2.0 |
 | [cran_workflow](skills/cran_workflow/) | Python | composition of `cran_graph` plus `cran_publisher`: audit a CRAN release end-to-end | v0.2.0 |
 | [autoresearch](skills/autoresearch/) | Python | autonomous optimization loop with a local LLM critic; Phase 6 anchor | v0.2.0 |
 
