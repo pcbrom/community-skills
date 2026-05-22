@@ -1,6 +1,9 @@
-"""cran_publisher: helpers for the CRAN publication pipeline.
+"""cran_publisher: helpers for publishing an R package.
 
-Phase 5.1 (this release) ships three pieces:
+The sub-package covers the two distribution channels of the R
+ecosystem.
+
+The CRAN channel:
 
 - :mod:`cran_publisher.check` runs ``R CMD check`` on a package source
   tree and captures stdout, stderr, and exit code.
@@ -10,10 +13,20 @@ Phase 5.1 (this release) ships three pieces:
 - :mod:`cran_publisher.categorize` assigns each issue to a category
   drawn from a living taxonomy under
   ``cran_publisher/data/error_taxonomy.json``.
+- :mod:`cran_publisher.fix_loop` proposes minimal patches with a local
+  Gemma model, validates each through a fresh check, and merges the
+  accepted ones onto a session branch.
+- :mod:`cran_publisher.report` renders the fix session as Markdown.
+- :mod:`cran_publisher.preflight` is the submission readiness gate, and
+  :mod:`cran_publisher.submit` runs the gated upload.
 
-Phases 5.2 (Gemma fix loop), 5.3 (Claude escalation + report
-generator), and 5.4 (bgumbel end-to-end submit) build on top of these
-modules; see the sprint plan for the full sequence.
+The r-universe channel:
+
+- :mod:`cran_publisher.runiverse` carries the r-universe readiness
+  gate, the ``packages.json`` registration, and the build-status query.
+  r-universe is the channel for a package CRAN cannot take, such as one
+  whose vendored dependency tree pushes the tarball past the 10 MB
+  limit.
 """
 from __future__ import annotations
 
