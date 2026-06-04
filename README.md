@@ -263,6 +263,24 @@ This hub continues a line of agent-tooling work by the maintainer:
 
 If you use community-skills, please cite the version you used. The Zenodo DOI evolves with each release; consult [`CITATION.cff`](CITATION.cff) or [`docs/citation.md`](docs/citation.md).
 
+### v0.2.0
+
+Brom, P. C. (2026). community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0) (0.2.0). Zenodo. https://doi.org/10.5281/zenodo.20543565
+
+```bibtex
+@software{brom2026community_skills_v020,
+  author    = {Brom, Pedro Carvalho},
+  title     = {community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0)},
+  year      = {2026},
+  version   = {0.2.0},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20543565},
+  url       = {https://doi.org/10.5281/zenodo.20543565}
+}
+```
+
+The concept DOI [`10.5281/zenodo.20543564`](https://doi.org/10.5281/zenodo.20543564) resolves to the latest published version and is the right anchor when the exact version is not the point.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
