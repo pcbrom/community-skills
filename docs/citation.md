@@ -15,12 +15,14 @@ GitHub renders it under "Cite this repository" on the project page.
   author       = {Brom, Pedro Carvalho and contributors},
   title        = {community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem},
   version      = {0.2.0},
-  date         = {2026-05-11},
+  date         = {2026-06-04},
   publisher    = {Zenodo},
-  doi          = {<DOI assigned at first release>},
-  url          = {https://github.com/pcbrom/community-skills}
+  doi          = {10.5281/zenodo.20543565},
+  url          = {https://doi.org/10.5281/zenodo.20543565}
 }
 ```
+
+The concept DOI (resolves to the latest version): `10.5281/zenodo.20543564`.
 
 ### APA
 

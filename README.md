@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/pcbrom/community-skills/actions/workflows/ci.yml)
 [![Skills: 110](https://img.shields.io/badge/skills-110-blue.svg)](skills/)
-[![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](https://zenodo.org/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20543565.svg)](https://doi.org/10.5281/zenodo.20543565)
 
 ## What this repository is
 
