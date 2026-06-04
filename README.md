@@ -5,6 +5,24 @@
 [![Skills: 110](https://img.shields.io/badge/skills-110-blue.svg)](skills/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20543565.svg)](https://doi.org/10.5281/zenodo.20543565)
 
+## How to cite
+
+Brom, P. C. (2026). community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0) (0.2.0). Zenodo. https://doi.org/10.5281/zenodo.20543565
+
+```bibtex
+@software{brom2026community_skills_v020,
+  author    = {Brom, Pedro Carvalho},
+  title     = {community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0)},
+  year      = {2026},
+  version   = {0.2.0},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20543565},
+  url       = {https://doi.org/10.5281/zenodo.20543565}
+}
+```
+
+The concept DOI [`10.5281/zenodo.20543564`](https://doi.org/10.5281/zenodo.20543564) resolves to the latest published version and is the right anchor when the exact version is not the point.
+
 ## What this repository is
 
 community-skills is an R-focused hub that turns CRAN packages into machine-readable skills that an LLM agent can invoke autonomously through a single contract: read JSON from stdin, write JSON to stdout. The project does not wrap Python or Julia packages and does not aim to be a multi-language registry (decision 2026-05-09).
@@ -261,25 +279,7 @@ This hub continues a line of agent-tooling work by the maintainer:
 
 ## Citation
 
-If you use community-skills, please cite the version you used. The Zenodo DOI evolves with each release; consult [`CITATION.cff`](CITATION.cff) or [`docs/citation.md`](docs/citation.md).
-
-### v0.2.0
-
-Brom, P. C. (2026). community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0) (0.2.0). Zenodo. https://doi.org/10.5281/zenodo.20543565
-
-```bibtex
-@software{brom2026community_skills_v020,
-  author    = {Brom, Pedro Carvalho},
-  title     = {community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem (v0.2.0)},
-  year      = {2026},
-  version   = {0.2.0},
-  publisher = {Zenodo},
-  doi       = {10.5281/zenodo.20543565},
-  url       = {https://doi.org/10.5281/zenodo.20543565}
-}
-```
-
-The concept DOI [`10.5281/zenodo.20543564`](https://doi.org/10.5281/zenodo.20543564) resolves to the latest published version and is the right anchor when the exact version is not the point.
+The canonical citation block lives at the top of this README. The machine-readable form lives in [`CITATION.cff`](CITATION.cff), and a longer narrative with APA, BibTeX for older releases, and ABNT lives in [`docs/citation.md`](docs/citation.md).
 
 ## License
 
