@@ -78,3 +78,8 @@ BRIEFING.md
 # Local checkouts of external CRAN packages used as test fixtures
 # (e.g. cran_graph_extra/bgumbel/ for the cran_publisher smoke test)
 /cran_graph_extra/
+
+# Convenience symlink to the sibling r-cs-packages umbrella folder
+# (gpumetropolis, skillbridge, ...). Operator-local; not part of the repo
+# contract.
+/r-cs-packages
