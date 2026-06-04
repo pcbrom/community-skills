@@ -6,6 +6,8 @@ Each release receives a Zenodo DOI. The DOI is added to the entry below once the
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-04
+
 ### 15 skills promoted to close the harness v0.1 curation queue (2026-06-04)
 - `gtsummary`, `survival`, `roxygen2`, `pkgdown`, `styler`, `lintr`, `marginaleffects`, `quarto`, `devtools`, `usethis`, `brms`, `lavaan`, `RefManageR`, `tinytable`, `rmarkdown` promoted from `_staging/` to `skills/<pkg>/`. Gallery size moves from 95 to 110 (5 core + 105 R). Generation through the documented pipeline (`triage` → `generate_skills_via_gemma` → `generate_invoke_r` → `promote_all`); wall-clock ~7 minutes for 14 skills, Gemma 4 26b-fast via local Ollama, zero monetary cost.
 - `rmarkdown` had failed auto-generation four times in May 2026 because its 94-function surface broke `invoke.R` parse; a fresh generation pass on 2026-06-04 produced a parse-clean dispatcher; the staged SKILL.md needed one editorial fix (`Yihlam Xie` → `Yihui Xie` in the maintainer line) before promotion.

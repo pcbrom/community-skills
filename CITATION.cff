@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use community-skills in your work, please cite as below."
 title: "community-skills: An R-focused hub of agent-callable skills for the CRAN ecosystem"
 version: 0.2.0
-date-released: "2026-05-11"
+date-released: 2026-06-04
 authors:
   - family-names: "Brom"
     given-names: "Pedro Carvalho"
