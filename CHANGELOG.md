@@ -6,6 +6,12 @@ Each release receives a Zenodo DOI. The DOI is added to the entry below once the
 
 ## [Unreleased]
 
+### 15 skills promoted to close the harness v0.1 curation queue (2026-06-04)
+- `gtsummary`, `survival`, `roxygen2`, `pkgdown`, `styler`, `lintr`, `marginaleffects`, `quarto`, `devtools`, `usethis`, `brms`, `lavaan`, `RefManageR`, `tinytable`, `rmarkdown` promoted from `_staging/` to `skills/<pkg>/`. Gallery size moves from 95 to 110 (5 core + 105 R). Generation through the documented pipeline (`triage` → `generate_skills_via_gemma` → `generate_invoke_r` → `promote_all`); wall-clock ~7 minutes for 14 skills, Gemma 4 26b-fast via local Ollama, zero monetary cost.
+- `rmarkdown` had failed auto-generation four times in May 2026 because its 94-function surface broke `invoke.R` parse; a fresh generation pass on 2026-06-04 produced a parse-clean dispatcher; the staged SKILL.md needed one editorial fix (`Yihlam Xie` → `Yihui Xie` in the maintainer line) before promotion.
+- Suite of 334 passed, 44 skipped after promotion; each new skill ships a structural smoke test in `tests/test_skills/test_<pkg>.py` that skips when the upstream R package is not installed locally.
+- Closes [pcbrom/community-skills#1](https://github.com/pcbrom/community-skills/issues/1); all 15 boxes ticked, milestone `harness-v0.1-readiness` ready to close once `harness` v0.1 is released.
+
 ### Skill-curation queue tied to the `harness` sister package (2026-06-04)
 - O package irmão `harness` em `r-cs-packages/harness/` entregou a Fase 1 (4 harnesses: data-scientist, statistician, package-maintainer, paper-author) e identificou 15 skills R faltantes no hub para destravar os 17 harnesses planejados do v0.1. A fila de curadoria está formalizada na issue [pcbrom/community-skills#1](https://github.com/pcbrom/community-skills/issues/1), milestone `harness-v0.1-readiness`, label `skill-curation`, ordenada por cobertura cross-harness (Tier A: gtsummary, survival; Tier B: rmarkdown, roxygen2, pkgdown, styler, lintr, marginaleffects, quarto; Tier C: devtools, usethis, brms, lavaan, RefManageR, tinytable).
 - Cada PR de skill segue o template em `templates/new_r_skill/`, passa o smoke test em `tests/test_skills/test_<skill>.py` e referencia a issue com `Refs #1`. O closing da issue (15 boxes marcadas) marca a v0.1 do `harness` pronta para release.

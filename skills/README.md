@@ -17,7 +17,7 @@ The bridge (`bridges/<runtime>.py`) is shared across all skills of the same runt
 
 ## Available skills (promoted)
 
-Gallery size as of 2026-05-11: **95 skills**.
+Gallery size as of 2026-06-04: **110 skills**.
 
 ### Core skills (5)
 
@@ -29,11 +29,13 @@ Gallery size as of 2026-05-11: **95 skills**.
 | [cran_workflow](cran_workflow/) | Python | `audit_release`, `fix_and_report`; composes `cran_graph` and `cran_publisher` | v0.2.0 |
 | [autoresearch](autoresearch/) | Python | `init`, `run`, `critic`, `analyze`, `audit`, `state` over [pcbrom/autoresearch](https://github.com/pcbrom/autoresearch) ([DOI 10.5281/zenodo.19772195](https://doi.org/10.5281/zenodo.19772195)); Phase 6 instrumental anchor | v0.2.0 |
 
-### CRAN top-100 R skills (90)
+### Promoted R skills (105)
 
-90 R skills drafted with Gemma 4 26b-fast from the cranlogs top-100 of the last month (2026-05-09) and promoted after passing a structural smoke screen described in [`docs/skill_generation.md`](../docs/skill_generation.md). Two of these (`glue`, `jsonlite`) carry hand-written semantic smoke tests on top of the structural check; the other 88 ship the structural stub only and are flagged for per-skill review before any user-visible release. A stratified audit on 2026-05-11 (random sample of 15 from the 28 installed-locally subset, seed 11) returned 15 / 15 structurally valid, 0 functional fails (`data/audit_stratified_2026-05-11.json`).
+105 R skills drafted with Gemma 4 26b-fast and promoted after passing a structural smoke screen described in [`docs/skill_generation.md`](../docs/skill_generation.md). Two of these (`glue`, `jsonlite`) carry hand-written semantic smoke tests on top of the structural check; the others ship the structural stub only and are flagged for per-skill review before any user-visible release. A stratified audit on 2026-05-11 (random sample of 15 from the 28 installed-locally subset, seed 11) returned 15 / 15 structurally valid, 0 functional fails (`data/audit_stratified_2026-05-11.json`).
 
-**Full list:** `abind, askpass, backports, base64enc, bgumbel, bit, bit64, broom, bslib, cachem, callr, cli, commonmark, cpp11, crayon, curl, data.table, DBI, desc, digest, dplyr, evaluate, farver, fastmap, fontawesome, fs, generics, ggplot2, glue, gtable, highr, hms, htmltools, htmlwidgets, httr, isoband, jsonlite, knitr, labeling, later, lifecycle, lme4, lubridate, magrittr, mime, openssl, pillar, pkgbuild, pkgload, prettyunits, processx, progress, promises, ps, purrr, R6, ragg, rappdirs, Rcpp, RcppArmadillo, RcppEigen, readr, readxl, rlang, rprojroot, rstudioapi, S7, sass, scales, shiny, stringi, stringr, sys, systemfonts, testthat, textshaping, tibble, tidyr, tidyselect, timechange, tinytex, tzdb, utf8, vctrs, viridisLite, vroom, withr, xfun, xml2, yaml, zoo`. One package (`rmarkdown`) failed to produce a parse-clean dispatcher across 4 generation attempts and remains in `_staging/` pending manual review.
+The first 90 came from the cranlogs top-100 of 2026-05-09. The next 15 landed on 2026-06-04 as the curation queue driven by the harness sister package ([issue #1](https://github.com/pcbrom/community-skills/issues/1), milestone `harness-v0.1-readiness`): `brms`, `devtools`, `gtsummary`, `lavaan`, `lintr`, `marginaleffects`, `pkgdown`, `quarto`, `RefManageR`, `rmarkdown`, `roxygen2`, `styler`, `survival`, `tinytable`, `usethis`. The `rmarkdown` draft, which had failed auto-generation four times in May (`invoke.R` parse error from a 94-function surface), passed validator on a fresh attempt with an editorial trim of the maintainer line.
+
+**Full list:** `abind, askpass, backports, base64enc, bgumbel, bit, bit64, brms, broom, bslib, cachem, callr, cli, commonmark, cpp11, crayon, curl, data.table, DBI, desc, devtools, digest, dplyr, evaluate, farver, fastmap, fontawesome, fs, generics, ggplot2, glue, gtable, gtsummary, highr, hms, htmltools, htmlwidgets, httr, isoband, jsonlite, knitr, labeling, later, lavaan, lifecycle, lintr, lme4, lubridate, magrittr, marginaleffects, mime, openssl, pillar, pkgbuild, pkgdown, pkgload, prettyunits, processx, progress, promises, ps, purrr, quarto, R6, ragg, rappdirs, Rcpp, RcppArmadillo, RcppEigen, readr, readxl, RefManageR, rlang, rmarkdown, roxygen2, rprojroot, rstudioapi, S7, sass, scales, shiny, stringi, stringr, styler, survival, sys, systemfonts, testthat, textshaping, tibble, tidyr, tidyselect, timechange, tinytable, tinytex, tzdb, usethis, utf8, vctrs, viridisLite, vroom, withr, xfun, xml2, yaml, zoo`.
 
 The list above grows by community contribution. Open an issue with the [`new_skill` template](../.github/ISSUE_TEMPLATE/new_skill.yml) to propose a wrap.
 
