@@ -250,6 +250,10 @@ Network-bound tests (full CRAN download, Ollama call) are skipped by default and
 
 Acceptance criteria for new skills are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+### Sister project: harness
+
+A separate R package, `harness`, consumes this hub as a curated catalogue. It packages each professional R role (data scientist, statistician, ML engineer, package maintainer, paper author, performance engineer, and ten others) as a YAML harness that subsets the skills here, supplies a role-specific system prompt and folder convention, and launches the user's CLI coder of choice (claude, opencode, codex, aider, gemini-cli) in a Terminal tab. `harness` lives under `r-cs-packages/harness/` and ships from its own repository on its own CRAN cycle, with the same MIT licence as this hub. The skill-curation queue that feeds `harness` v0.1 is tracked in [issue #1](https://github.com/pcbrom/community-skills/issues/1).
+
 ## Genealogy
 
 This hub continues a line of agent-tooling work by the maintainer:
